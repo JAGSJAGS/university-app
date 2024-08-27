@@ -1,0 +1,17 @@
+<div class="container">
+    <div class="container-login"><br>
+      <h4>Login</h4><br>
+      <form (ngSubmit)="login()" #loginForm="ngForm"> 
+          <div class="form-group input">
+            <input type="email" id="email" name="email" [(ngModel)]="this.email" required placeholder="Email">
+            <p *ngIf="this.showErrorEmail">{{this.emailError}}</p>
+          </div>
+          <div class="form-group input">
+            <input type="password" id="password" name="password" [(ngModel)]="this.password" required placeholder="Password">
+            <p *ngIf="this.showErrorPassword">{{this.passwordError}}</p>
+          </div>
+          <button type="submit">Log in</button>
+      </form>
+    </div>
+    <app-message [messageError]="[{ severity: this.severetyMessage, detail: this.messageError }]" *ngIf="this.showMessageError"></app-message>
+</div>

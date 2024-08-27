@@ -27,21 +27,25 @@
             <tr>
               <td style="padding: 2% 1%;">
                 <div (click)="showSubject(subject.code, 1)" class="subject" [id]="'small' + subject.code" [style]="changeStyle(subject.quarts)">
-                  {{this.paintValidateSubject(subject.code, subject.validate, 'small')}} 
+                  <!-- {{this.paintValidateSubject(subject.code, subject.validate, 'small')}}  -->
+                  {{this.paintFailSubject(subject.code, subject.fail, 'small', subject.validate)}}
                   {{subject.name}}
-                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.code, year.year, 'left')"><i class="pi pi-angle-left"></i></div>
-                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.code, year.year, 'right')"><i class="pi pi-angle-right"></i></div> 
+                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.code, year.year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
+                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.code, year.year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
                 </div>
 
                 <div  class="subject bigSubject" [id]="'big' + subject.code" >
-                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.code, year.year, 'left')"><i class="pi pi-angle-left"></i></div>
+                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.code, year.year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
                   <i class="pi pi-minus exit" (click)="showSubject(subject.code, 2)"></i>
-                  {{subject.name}} {{this.paintValidateSubject(subject.code, subject.validate, 'big')}}
+                  {{subject.name}}
+                  <!-- {{this.paintValidateSubject(subject.code, subject.validate, 'big')}} -->
+                  {{this.paintFailSubject(subject.code, subject.fail, 'big', subject.validate)}}
                   <div class="container-button">
                     <button   class="button-validate" (click)="validate(year.year, subject.code)">Validate</button>
-                    <button class="button-fail" (click)="validate(year.year, subject.code)">Validate</button>
+                    <button class="button-fail" (click)="fail(subject.code, year.year, !subject.fail)" *ngIf="!subject.fail">Fail</button>
+                    <button class="button-fail" (click)="fail(subject.code, year.year, !subject.fail)" *ngIf="subject.fail">Pass</button>
                   </div>
-                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.code, year.year, 'right')"><i class="pi pi-angle-right"></i></div> 
+                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.code, year.year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
                 </div>
               </td>
             </tr>        

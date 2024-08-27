@@ -3,15 +3,19 @@ export interface Subject {
     name: string;
     code: string;
     quarts: string[];
-    validate: boolean
+    validate: boolean,
+    fail: boolean,
+    requirement: string []
 }
 
 export interface Year {
+    id: number;
     year: number;
     subjects: Subject[];
 }
 
 export interface Career {
-    career: string;
+    id: number
+    name: string;
     years: Year[];
 }

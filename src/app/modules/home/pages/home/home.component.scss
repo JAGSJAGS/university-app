@@ -1,0 +1,34 @@
+.container{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F9FAFB;
+}
+.container-login{
+    width: 32%;
+    border-radius: 20px;
+    padding: 0% 3% 3% 3%;
+    box-shadow: 0px 0px 20px 5px #0000002d;
+    background-color: #F9FAFB;
+}
+.button-select{
+    margin-top: 2%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+.button-login{
+    position: absolute;
+    top: 1%;
+    right: 0%;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    padding-right: 2%;
+    button{
+        padding: 1.5vh 1.5vw;
+    }
+}

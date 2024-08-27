@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="container-menu">
+        <button>Closse Menu</button>
+        <button>Closse Menu</button>
+        <button>Closse Menu</button>
+        <button class="button-closse" (click)="logoutUser()">Closse Menu</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="container-show-career">
+        <div class="container-career">
+            <button (click)="this.showCareer = true">holas</button>
+        </div>
+        <div class="container-career">b</div>
+        <div class="container-career">ch</div>
+    </div>
+</div>
+<div class="container-card-add" *ngIf="this.showCareer">
+    <div class="card-add">
+        <div class="exit"><i class="pi pi-times" (click)="this.showCareer = false"></i></div>
+        <app-add-career></app-add-career>
+    </div>
+</div>

@@ -18,7 +18,6 @@ export class PanelComponent {
   ) { }
 
   ngOnInit(): void {
-    
   }
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -125,6 +124,41 @@ export class PanelComponent {
     this.renderer.setStyle(subject, 'background-color', color); 
   }
 
+  paintFailSubject(subjectCode: string, fail: boolean, type: string, validate: boolean){
+    let color: string = ""
+    if(fail){
+      color = '#7c3a3a';
+      if(type === 'big'){
+        color = '#7c3a3ab4';      
+      }
+      
+    }
+    else{
+      //color = '#009172';
+      if(type === 'big'){
+        color = '#00ae8e';
+      }
+    }
+    if(validate){
+      color = '#a2c4c7';
+    }
+    let subject = this.elementRef.nativeElement.querySelector('#' + type + subjectCode);
+    this.renderer.setStyle(subject, 'background-color', color); 
+
+      /* year.subjects.forEach(subject => {
+        
+          if (subject.code !== subjectCode && subject.requirement.includes(subjectCode)) {
+            let subjectRend = this.elementRef.nativeElement.querySelector('#' + type + subjectCode);
+            let subjectRend2 = this.elementRef.nativeElement.querySelector('#small' + subject.code);
+              console.log("el codigo es:", subjectCode);
+              console.log("esta incluido en :" ,subject.code);
+              this.renderer.setStyle(subjectRend2, 'background-color', '#7c3a3ab4'); 
+              this.renderer.setStyle(subjectRend, 'background-color', '#7c3a3ab4'); 
+              
+          }
+      }); */
+  }
+
   validate(yearId: number, subjectCode: string){
     this.career.years.forEach(year => {
       if (year.year === yearId) {
@@ -184,6 +218,7 @@ export class PanelComponent {
   newYear(){
     let newYearId =  this.career.years[this.career.years.length - 1]?.year + 1;
     let newYear: Year = {
+      id: 0,
       year: newYearId,
       subjects: []
     }
@@ -195,5 +230,82 @@ export class PanelComponent {
     if (yearIndex !== -1) {
         this.career.years.splice(yearIndex, 1);
     }
+  }
+
+  fail(subjectCode: string, yearId: number, fail: boolean){
+    if(fail){
+      if(this.existYear(yearId + 1)){
+        this.changeFail(subjectCode, yearId);
+        this.deleteSubjectYear(subjectCode, yearId, yearId + 1);
+        this.requirementSubject2(subjectCode, fail);
+        console.log('añoFail', subjectCode)
+      }
+    }
+    else{
+      if(this.existYear(yearId - 1)){
+        this.requirementSubject2(subjectCode, fail);
+        this.changeFail(subjectCode, yearId);
+        this.deleteSubjectYear(subjectCode, yearId, yearId - 1);
+        console.log('añoNoFail', subjectCode)
+      }
+    }
+    
+  }
+
+  changeFail(subjectCode: string, yearId: number){
+    this.career.years.forEach(year => {
+      if (year.year === yearId) {
+        year.subjects.forEach(subject =>{
+          if(subject.code == subjectCode){
+            if(subject.fail === true){
+              subject.fail = false;
+            }
+            else{
+              subject.fail = true;
+            }
+          }
+        })  
+      }
+    });
+  }
+
+  requirementSubject(subjectCode: string){
+
+    this.career.years.forEach(year => {
+
+        year.subjects.forEach(subject => {
+          let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subject.code);
+          let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subject.code);
+          if (subject.code !== subjectCode && subject.requirement.includes(subjectCode)){
+              this.renderer.addClass(subjectRend, 'highlight-important');
+              this.renderer.addClass(subjectRend1, 'highlight-important');
+          }
+        });
+    });
+  }
+
+  requirementSubject2(subjectCode: string, fail: boolean){
+
+    this.career.years.forEach(year => {
+
+        year.subjects.forEach(subject => {
+          let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subject.code);
+          let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subject.code);
+          if (subject.code !== subjectCode && subject.requirement.includes(subjectCode)){
+            if(fail){
+              this.renderer.removeClass(subjectRend, 'highlight-important2');
+              this.renderer.removeClass(subjectRend1, 'highlight-important2');
+              this.renderer.addClass(subjectRend, 'highlight-important');
+              this.renderer.addClass(subjectRend1, 'highlight-important');
+            }
+            else{
+              this.renderer.removeClass(subjectRend, 'highlight-important');
+              this.renderer.removeClass(subjectRend1, 'highlight-important');
+              this.renderer.addClass(subjectRend, 'highlight-important2');
+              this.renderer.addClass(subjectRend1, 'highlight-important2');
+            }
+          }
+        });
+    });
   }
 }

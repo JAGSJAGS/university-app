@@ -1,0 +1,17 @@
+<div class="container">
+    <div class="container-login"><br>
+      <h4></h4><br><br>
+        <form (ngSubmit)="this.goToPanel()" #loginForm="ngForm"> 
+            <div class="form-group input input-language">
+                <select id="language" name="career" [(ngModel)]="this.nameCareer" required>
+                    <option value="" disabled selected>Select Career</option>
+                    <option value="{{nameCareer}}" *ngFor="let nameCareer of this.namesCareer" [routerLink]="['/panel']">{{nameCareer}}</option>
+                </select>
+            </div>
+            <div class="button-select"><button type="submit">Select</button></div>
+        </form>
+    </div>
+
+    <div class="button-login" [routerLink]="['/login']"><button>Login</button></div>
+    <!-- <app-message [messageError]="[{ severity: this.severetyMessage, detail: this.messageError }]" *ngIf="this.showMessageError"></app-message> -->
+</div>

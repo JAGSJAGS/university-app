@@ -1,0 +1,40 @@
+.container{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F9FAFB;
+}
+.container-login{
+    width: 32%;
+    border-radius: 20px;
+    padding: 0% 3% 3% 3%;
+    box-shadow: 0px 0px 20px 5px #0000002d;
+    background-color: #F9FAFB;
+}
+.input{
+    margin-bottom: 5%;
+    p{
+        color: #7c3a3a;
+    }
+}
+input{
+    width: 100%;
+    height: 40px;
+    border: 1px solid #c6c6c6;
+    border-radius: 10px;
+}
+input:focus {
+    border: 2.5px solid #c6c6c6; /* Cambia el color y el grosor del borde cuando el input está seleccionado */
+    outline: none; /* Elimina el contorno predeterminado en algunos navegadores */
+  }
+::placeholder {
+    color: #afafaf; /* Puedes cambiar "red" por el color que desees */
+}
+button{
+    width: 100%;
+    border-radius: 20px;
+    height: 42px;
+    box-shadow: 0px 0px 10px 5px #0000002d;
+}

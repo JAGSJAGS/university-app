@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './pages/home/home.component';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -13,7 +14,8 @@ import { PrimeNgModule } from '../prime-ng/prime-ng.module';
   imports: [
     CommonModule,
     HomeRoutingModule,
-    PrimeNgModule
+    PrimeNgModule,
+    FormsModule
   ]
 })
 export class HomeModule { }
