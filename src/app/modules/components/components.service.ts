@@ -32,7 +32,7 @@ export class ComponentsService {
           "data": {
             "Career":{
               "id": career.id,
-              "name": career.name,
+              "name": career.name + '.json',
               "years": career.years
             }
           }

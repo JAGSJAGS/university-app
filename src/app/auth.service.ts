@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { from, map, Observable, switchMap } from 'rxjs';
 import { User } from './interfaces/user';
 import { Storage } from '@ionic/storage-angular';
+import { Career } from './interfaces/Career';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,11 @@ export class AuthService {
         return this.http.get<any>(url, { headers });
       })
     )
+  }
+
+  getJsonFile(nameFile: string):Observable<Career>{
+    let url = `${ this.apiUrl }/get_json_file`;
+    return this.http.post<Career>( url, {'file_name': nameFile});
   }
 
   /* registerUser2( user: User):Observable<any>{
@@ -64,7 +70,7 @@ export class AuthService {
     )
   } */
 
-  /* getUserProfile(): Observable<any> {
+  getUserProfile(): Observable<any> {
     const url = `${this.apiUrl}/user_profile`;
     return from(this.getToken()).pipe(
       switchMap(token => {
@@ -74,7 +80,7 @@ export class AuthService {
         return this.http.get<any>(url, { headers });
       })
     );
-  } */
+  }
 
   /* logOutUser(){
     const url = `${this.apiUrl}/logout_user`;

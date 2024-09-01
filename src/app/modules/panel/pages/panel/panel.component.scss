@@ -33,11 +33,12 @@
 }
 .p-table{
   width: 25%;
+  min-height: 65vh;
   margin-left: 5px;
   flex: 0 0 auto; /* Evita que los elementos se redimensionen */
   border: solid #c6c6c6 1px;
   position: relative;
-  padding-bottom: 5vh;
+  padding-bottom: 10vh;
 }
 .quarts{
   display: flex;
@@ -47,9 +48,21 @@
 }
 .quarts-botom{
   position: absolute;
+  bottom: 5vh;
+  display: flex;
+  flex-direction: row;
+  padding: 0%;
+  height: 5vh;
+  width: 100%;
+  border-top: #c6c6c6 solid 1px;
+}
+.quarts-botom2{
+  position: absolute;
   bottom: 0;
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
   padding: 0%;
   height: 5vh;
   width: 100%;

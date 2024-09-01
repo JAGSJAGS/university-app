@@ -5,7 +5,8 @@ export interface Subject {
     quarts: string[];
     validate: boolean,
     fail: boolean,
-    requirement: string []
+    requirement: string [],
+    credit: number
 }
 
 export interface Year {

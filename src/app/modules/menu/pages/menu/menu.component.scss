@@ -2,9 +2,11 @@
     width: 100%;
     height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: start;
     align-items: center;
     background-color: #F9FAFB;
+    padding-top: 10vh;
 }
 
 .container-menu{
@@ -27,15 +29,29 @@
     width: 90%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: start;
+}
+
+.section-career{
+    width: 30vw;
+    display: flex;
+    flex-direction: column;
+    margin-right: 2vw;
 }
 
 .container-career{
-    width: 32.5%;
+    width: 100%;
     border-radius: 20px;
     padding: 3% 3% 3% 3%;
     box-shadow: 0px 0px 20px 5px #0000002d;
     background-color: #F9FAFB;
+}
+
+.button-select{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
 }
 
 .container-card-add{
@@ -56,10 +72,46 @@
     padding: 3% 3% 3% 3%;
     box-shadow: 0px 0px 20px 5px #0000002d;
     background-color: #F9FAFB;
-    .exit{
+    
+}
+
+.exit{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.container-icons{
+    display: flex;
+    flex-direction: row;
+    i{
+        font-size: 32px;
+        margin-right: 10px;
+    }
+}
+
+.container-add-career{
+    width: 100%;
+    height: 100%;
+    .button{
         width: 100%;
         display: flex;
         flex-direction: column;
         align-items: end;
+    }
+}
+
+.button-closse{
+    position: absolute;
+    top: 1%;
+    right: 0%;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    padding-right: 2%;
+    button{
+        padding: 1.5vh 1.5vw;
+        background-color: #b41f1f;
     }
 }

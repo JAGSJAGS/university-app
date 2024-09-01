@@ -1,5 +1,8 @@
 import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { Career, Subject, Year } from '../../../../interfaces/Career';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../../../auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-panel',
@@ -8,17 +11,51 @@ import { Career, Subject, Year } from '../../../../interfaces/Career';
 })
 export class PanelComponent {
 
+  subs: Subscription = new Subscription();
+
   career!: Career;
+  careerBack!: Career;
+
 
   list1 = ['Get to workfdasfda'];
 
   constructor(
     private elementRef: ElementRef, 
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    this.initLoad();
   }
+  initLoad(){
+    this.activatedRoute.params.subscribe(({ id }) => {
+      this.loadFile(id);
+    });
+  }
+
+  loadFile(nameFile: string){
+      this.subs.add(this.authService.getJsonFile(nameFile).subscribe({
+        next: (career) => {
+          this.career = career;
+          this.careerBack = career;
+        },
+        error: (error) => {
+          //this.showSpinner = false;
+          console.log("Error en el inicio de sesión:", error);
+          if (error && error.error && error.error.message) {
+            //this.messageError = error.error.message; 
+            console.log("Mensaje: error al crear Carrera", error.error.message);
+          } else {
+            console.log("Error desconocido");
+          }
+          /* this.showMessageError = true;
+          this.severetyMessage = 'error' */
+        }
+      }));
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) {
@@ -104,7 +141,7 @@ export class PanelComponent {
     let res: number = 0;
     for (let subject of subjects) {
       if(subject.validate == false){
-        res = this.hoursQuart(subject.quarts, 20)[i] + res;
+        res = this.hoursQuart(subject.quarts, subject.credit)[i] + res;
       }
     }
     return Math.trunc(res);
@@ -307,5 +344,9 @@ export class PanelComponent {
           }
         });
     });
+  }
+
+  suma(num1: number, num2: number, num3: number, num4: number){
+    return num1 + num2 + num3 + num4;
   }
 }

@@ -1,24 +1,174 @@
-<div class="container">
-    <div class="container-menu">
-        <button>Closse Menu</button>
-        <button>Closse Menu</button>
-        <button>Closse Menu</button>
-        <button class="button-closse" (click)="logoutUser()">Closse Menu</button>
-    </div>
-</div>
+<div class="button-closse"><button  (click)="logoutUser()">Closse Menu</button></div>
 
 <div class="container">
     <div class="container-show-career">
-        <div class="container-career">
-            <button (click)="this.showCareer = true">holas</button>
+        
+        <div class="section-career">
+            <div class="container-career">
+                <h5>Career: {{this.nameCareer}}</h5>
+                <br>
+                <div class="container-icons">
+                    <i class="pi pi-plus-circle" (click)="this.showCreateCareer = true; this.showEditCareer = false"></i>  
+                    <i class="pi pi-file-edit" (click)="this.showEditCareer = true; this.showCreateCareer = false"></i> 
+                    <i class="pi pi-trash" ></i>
+                </div>
+                <br>
+                <br>
+                <form (ngSubmit)="this.selectCareer()" #loginForm="ngForm"> 
+                    <div class="form-group input input-career">
+                        <select id="career" name="career" [(ngModel)]="this.nameCareer" required>
+                            <option value="" disabled selected>Select Career</option>
+                            <option value="{{nameCareer}}" *ngFor="let nameCareer of this.namesCareer" >{{nameCareer}}</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="button-select"><button type="submit">Select</button></div>
+                </form>
+                <br>
+                <br>
+                <!-- <button style="background-color: #3434a7;" (click)="this.showAddYear = true; this.showEditYear = false"><i class="pi pi-plus-circle" ></i>Add Year</button> -->
+            </div>
+            <br>
+            <div class="container-career" *ngIf="this.showEditCareer">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditCareer = false"></i></div>
+                <h5>Edit</h5>
+                <br>
+                <form (ngSubmit)="editCareer()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <p>Name</p>
+                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Edit Career</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career" *ngIf="this.showCreateCareer">
+                <div class="exit"><i class="pi pi-times" (click)="this.showCreateCareer = false"></i></div>
+                <h5>Create Career</h5>
+                <br>
+                <form (ngSubmit)="createCareer()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Create</button></div> 
+                </form>
+            </div>
         </div>
-        <div class="container-career">b</div>
-        <div class="container-career">ch</div>
+
+        <div class="section-career" *ngIf="this.career.years.length > 0">
+            
+            <div class="container-career" >
+                <h5>Year: {{this.year.year}}</h5>
+                <br>
+                <div class="container-icons"> 
+                    <i class="pi pi-plus-circle" (click)="this.showAddYear = true; this.showEditYear = false"></i> 
+                    <i class="pi pi-file-edit" (click)="this.showEditYear = true; this.showAddYear = false"></i> 
+                    <i class="pi pi-trash" ></i>
+                </div>
+                <br>
+                <br>
+                <form (ngSubmit)="this.selectYear()" #loginForm="ngForm"> 
+                    <div class="form-group input input-year">
+                        <select id="year" name="year" [(ngModel)]="this.yearSelect" required>
+                            <option value="{{year.year}}" *ngFor="let year of this.career.years" >{{year.year}}</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="button-select"><button type="submit">Select</button></div>
+                </form>
+                <br>
+                <br>
+                <button style="background-color: #3434a7;"><i class="pi pi-plus-circle" ></i>Add Subject</button>
+            </div>
+            <br>
+            <div class="container-career" *ngIf="this.showEditYear">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditYear = false"></i></div>
+                <h5>Edit Year</h5>
+                <br>
+                <form (ngSubmit)="editYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <p>Year</p>
+                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="Year">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Edit Year</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career" *ngIf="this.showAddYear">
+                <div class="exit"><i class="pi pi-times" (click)="this.showAddYear = false"></i></div>
+                <h5>Create Year</h5>
+                <br>
+                <form (ngSubmit)="addYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="Year">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Create Year</button></div> 
+                </form>
+            </div>
+        </div>
+        
+        <!-- <div class="section-career">
+            
+            <div class="container-career" >
+                <h5>Subject: {{this.year.subjects}}</h5>
+                <br>
+                <div class="container-icons"> 
+                    <i class="pi pi-file-edit" (click)="this.showEditYear = true; this.showAddYear = false"></i> 
+                    <i class="pi pi-trash" ></i>
+                </div>
+                <br>
+                <br>
+                <form (ngSubmit)="this.selectYear()" #loginForm="ngForm"> 
+                    <div class="form-group input input-subject">
+                        <select id="subject" name="subject" [(ngModel)]="this.subject.code" required>
+                            <option value="{{subject.code}}" *ngFor="let subject of this.year.subjects" >{{subject.name}}</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="button-select"><button type="submit">Select</button></div>
+                </form>
+                <br>
+                <br>
+                <button style="background-color: #3434a7;"><i class="pi pi-plus-circle" ></i>Add Year</button>
+            </div>
+            <br>
+            <div class="container-career" *ngIf="this.showEditYear">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditYear = false"></i></div>
+                <h5>Edit Year</h5>
+                <br>
+                <form (ngSubmit)="editYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <p>Year</p>
+                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="Year">
+                        
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Edit Year</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career" *ngIf="this.showAddYear">
+                <div class="exit"><i class="pi pi-times" (click)="this.showAddYear = false"></i></div>
+                <h5>Create Year</h5>
+                <br>
+                <form (ngSubmit)="addYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="Year">
+                       
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">Create Year</button></div> 
+                </form>
+            </div>
+        </div> -->
     </div>
 </div>
-<div class="container-card-add" *ngIf="this.showCareer">
-    <div class="card-add">
-        <div class="exit"><i class="pi pi-times" (click)="this.showCareer = false"></i></div>
-        <app-add-career></app-add-career>
-    </div>
-</div>
+
