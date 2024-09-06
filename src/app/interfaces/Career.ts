@@ -20,3 +20,12 @@ export interface Career {
     name: string;
     years: Year[];
 }
+
+export interface Careers {
+    data: Career[]
+}
+
+export interface Years{
+    data: Year[]
+}
+

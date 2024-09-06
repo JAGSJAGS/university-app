@@ -31,11 +31,28 @@ export class PanelComponent {
   }
   initLoad(){
     this.activatedRoute.params.subscribe(({ id }) => {
-      this.loadFile(id);
+      this.getCareer(id);
     });
   }
 
-  loadFile(nameFile: string){
+  getCareer(id: number){
+    this.subs.add(this.authService.getCareer(id).subscribe({
+      next: (career) => {
+        this.career = career.data;
+        this.careerBack = career.data;
+        console.log(this.career.years);
+      },
+      error: (error) => {
+        if (error && error.error && error.error.message) {
+          //this.messageError = error.error.message; 
+          console.log("Mensaje: error getCareer", error.error.message);
+        } else {
+          console.log("Error desconocido");
+        } 
+      }
+    }));
+  }
+  /* loadFile(nameFile: string){
       this.subs.add(this.authService.getJsonFile(nameFile).subscribe({
         next: (career) => {
           this.career = career;
@@ -50,11 +67,11 @@ export class PanelComponent {
           } else {
             console.log("Error desconocido");
           }
-          /* this.showMessageError = true;
-          this.severetyMessage = 'error' */
+          // this.showMessageError = true;
+          //this.severetyMessage = 'error' 
         }
       }));
-  }
+  } */
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

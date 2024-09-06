@@ -18,7 +18,7 @@ export class ComponentsService {
     private storage: Storage
   ) { }
 
-  createCareer( career: Career):Observable<Career>{
+  /* createCareer( career: Career):Observable<Career>{
     let url = `${ this.apiUrl }/create_json_file`;
 
     return from(this.getToken()).pipe(
@@ -42,7 +42,7 @@ export class ComponentsService {
         });
       })
     );
-  }
+  } */
 
   private getToken(): Promise<string | null> {
     return this.storage.get('access_token');

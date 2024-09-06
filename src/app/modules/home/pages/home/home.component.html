@@ -3,9 +3,8 @@
       <h4></h4><br><br>
         <form (ngSubmit)="this.goToPanel()" #loginForm="ngForm"> 
             <div class="form-group input input-language">
-                <select id="language" name="career" [(ngModel)]="this.nameCareer" required>
-                    <option value="" disabled selected>Select Career</option>
-                    <option value="{{nameCareer}}" *ngFor="let nameCareer of this.namesCareer" [routerLink]="['/panel']">{{nameCareer}}</option>
+                <select id="language" name="career" [(ngModel)]="this.career.id" required>
+                    <option value="{{career.id}}" *ngFor="let career of this.careers.data" [routerLink]="['/panel']">{{career.name}}</option>
                 </select>
             </div>
             <div class="button-select"><button type="submit">Select</button></div>

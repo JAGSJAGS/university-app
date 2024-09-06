@@ -39,6 +39,25 @@ export class AuthService {
     return this.http.post<Career>( url, {'file_name': nameFile});
   }
 
+  getCareer(id: number): Observable<any> {
+    let url = `${this.apiUrl}/get_all_career`;
+  
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        let options = {
+          headers,
+          params: {
+            'id': id
+          }
+        };
+        return this.http.get<any>(url, options);
+      })
+    );
+  }
+
   /* registerUser2( user: User):Observable<any>{
     let url = `${ this.apiUrl }/register_user`;
     return this.http.post<any>( url, {

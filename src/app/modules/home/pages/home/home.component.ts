@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage-angular';
 import { HomeService } from '../../home.service';
 import { Subscription } from 'rxjs';
+import { Career, Careers } from '../../../../interfaces/Career';
 
 @Component({
   selector: 'app-home',
@@ -13,9 +14,12 @@ export class HomeComponent {
 
   subs: Subscription = new Subscription();
 
-  namesCareer: string[] = [""];
-
-  nameCareer: string = ""
+  careers: Careers = {data:[]};
+  career: Career = {
+    id: 0,
+    name: "",
+    years: []
+  }
 
   showSpinner: boolean = false;
   constructor(
@@ -38,16 +42,15 @@ export class HomeComponent {
   }
 
   goToPanel(){
-    console.log("name:" , this.nameCareer);
-    this.router.navigate(['/panel', this.nameCareer]);
+    this.router.navigate(['/panel', this.career.id]);
   }
 
   getNamesCareer(){
     this.showSpinner = true;
-    this.subs.add(this.homeService.getNamesCareer().subscribe({
+    this.subs.add(this.homeService.getCareers().subscribe({
       next: (namesCareer) => {
         this.showSpinner = false;
-        this.namesCareer = namesCareer;
+        this.careers = namesCareer;
       },
       error: (error) => {
         this.showSpinner = false;

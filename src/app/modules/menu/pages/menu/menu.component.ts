@@ -4,7 +4,7 @@ import { AuthService } from '../../../../auth.service';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage-angular';
 import { MenuService } from '../../menu.service';
-import { Career, Year, Subject } from '../../../../interfaces/Career';
+import { Career, Year, Subject, Careers, Years } from '../../../../interfaces/Career';
 import { HttpHeaders } from '@angular/common/http';
 
 @Component({
@@ -20,19 +20,31 @@ export class MenuComponent {
   password: string = "";
   messageError: string = "";
   severetyMessage: string = "";
-  nameCareer: string = "";
+  nameFile: string = "";
+  newNameCaeer: string = "";
 
   
 
   showSpinner: boolean = true;
   showMessageError: boolean = false;
-  showCareer: boolean = false;
+  showCareer: boolean = true;
   showEditCareer: boolean = false;
   showCreateCareer: boolean = false;
+  showYear: boolean = false;
   showEditYear: boolean = false;
-  showAddYear: boolean = false;
+  showCreateYear: boolean = false;
+  showSubject: boolean = false;
+  showCreateSubject: boolean = false;
+  showEditSubject: boolean = false;
+  showDeleteCareer: boolean = false;
+  showDeleteYear: boolean = false;
 
-  namesCareer: string[] = [""];
+  namesCareer: any[] = [];
+
+  files: any = [];
+
+  careers: Careers = {data: []};
+  years: Years = {data: []};
 
   career: Career = {
     id:0,
@@ -45,6 +57,7 @@ export class MenuComponent {
     year:0,
     subjects:[]
   }
+
 
   subject: Subject = {
     id: "",
@@ -65,8 +78,236 @@ export class MenuComponent {
   ){}
 
   ngOnInit(): void {
-    this.getNamesCareer();
+    //this.getNameCareers();
+    this.getCareers();
   }
+
+  getCareers(){
+    this.showSpinner = true;
+    this.subs.add(this.menuService.getCareers().subscribe({
+      next: (careers) => {
+        console.log(careers);
+        this.careers = careers
+      },
+      error: (error) => {
+        this.showSpinner = false;
+        console.log("error getCategories: " + error);
+      }
+    }));
+  }
+
+  selectEditCareer(career: Career){
+    this.showEditCareer = true;
+    this.showCreateCareer = false;
+    this.career = {...career};
+  }
+
+  updateCareer(){
+    if(this.validate()){
+      this.subs.add(this.menuService.updateCareer(this.career).subscribe({
+        next: (career) => {
+          this.getCareers();
+        },
+        error: (error) => {
+          //this.showSpinner = false;
+          console.log("Error en el inicio de sesión:", error);
+          if (error && error.error && error.error.message) {
+            //this.messageError = error.error.message; 
+            console.log("Mensaje: error al crear Carrera", error.error.message);
+          } else {
+            console.log("Error desconocido");
+          }
+        }
+      }));
+    }
+  }
+
+  selectCreateCareer(){
+    this.showCreateCareer = true; 
+    this.showEditCareer = false;
+    this.career = {
+      id:0,
+      name: "",
+      years: []
+    }
+  }
+
+  createCareer(){
+    if(this.validate()){
+      this.subs.add(this.menuService.createCareer(this.career).subscribe({
+        next: (career) => {
+          this.career = {
+            id:0,
+            name: "",
+            years: []
+          }
+          this.getCareers();
+        },
+        error: (error) => {
+          //this.showSpinner = false;
+          console.log("Error en el inicio de sesión:", error);
+          if (error && error.error && error.error.message) {
+            //this.messageError = error.error.message; 
+            console.log("Mensaje: error al crear Carrera", error.error.message);
+          } else {
+            console.log("Error desconocido");
+          }
+        }
+      }));
+    }
+  }
+
+  selectDeleteCareer(career: Career){
+    this.showDeleteCareer = true;
+    this.career = {...career};
+  }
+
+  deleteCareer(){
+    this.subs.add(this.menuService.deleteCareer(this.career).subscribe({
+      next: (career) => {
+        this.getCareers();
+      },
+      error: (error) => {
+        //this.showSpinner = false;
+        console.log("Error en el inicio de sesión:", error);
+        if (error && error.error && error.error.message) {
+          //this.messageError = error.error.message; 
+          console.log("Mensaje: error al crear Carrera", error.error.message);
+        } else {
+          console.log("Error desconocido");
+        }
+      }
+    }));
+  }
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////
+
+
+
+
+  selectYears(career: Career){
+    this.career = {...career}
+    this.subs.add(this.menuService.getYears(this.career).subscribe({
+      next: (years) => {
+        this.years = years;
+        this.showYears();
+      },
+      error: (error) => {
+        //this.showSpinner = false;
+        console.log("Error en el inicio de sesión:", error);
+        if (error && error.error && error.error.message) {
+          //this.messageError = error.error.message; 
+          console.log("Mensaje: error al crear Carrera", error.error.message);
+        } else {
+          console.log("Error desconocido");
+        }
+      }
+    }));
+    
+  }
+
+  getYears(){
+    this.subs.add(this.menuService.getYears(this.career).subscribe({
+      next: (years) => {
+        this.years = years;
+      },
+      error: (error) => {
+        //this.showSpinner = false;
+        console.log("Error en el inicio de sesión:", error);
+        if (error && error.error && error.error.message) {
+          //this.messageError = error.error.message; 
+          console.log("Mensaje: error al crear Carrera", error.error.message);
+        } else {
+          console.log("Error desconocido");
+        }
+      }
+    }));
+  }
+
+  selectUpdateYear(year: Year){
+    this.year = { ...year };
+    this.showEditYear = true; 
+    this.showCreateYear = false;
+  }
+
+  updateYear(){
+    if(this.validate()){
+      this.subs.add(this.menuService.updateYear(this.year).subscribe({
+        next: (year) => {
+          this.getYears();
+        },
+        error: (error) => {
+          //this.showSpinner = false;
+          console.log("Error en el inicio de sesión:", error);
+          if (error && error.error && error.error.message) {
+            //this.messageError = error.error.message; 
+            console.log("Mensaje: error al crear Carrera", error.error.message);
+          } else {
+            console.log("Error desconocido");
+          }
+        }
+      }));
+    }
+  }
+
+  selectCreateYear(){
+    this.showCreateYear = true;
+    this.showEditYear = false;
+  }
+
+  createYear(){
+    if(this.validate()){
+      this.subs.add(this.menuService.createYear(this.year, this.career).subscribe({
+        next: (year) => {
+          this.getYears();
+        },
+        error: (error) => {
+          //this.showSpinner = false;
+          console.log("Error en el inicio de sesión:", error);
+          if (error && error.error && error.error.message) {
+            //this.messageError = error.error.message; 
+            console.log("Mensaje: error al crear Carrera", error.error.message);
+          } else {
+            console.log("Error desconocido");
+          }
+        }
+      }));
+    }
+  }
+
+  selectDeleteYear(year: Year){
+    this.showDeleteYear = true;
+    this.year = {...year};
+  }
+
+  deleteYear(){
+    this.subs.add(this.menuService.deleteYear(this.year).subscribe({
+      next: (year) => {
+        this.getYears();
+      },
+      error: (error) => {
+        //this.showSpinner = false;
+        console.log("Error en el inicio de sesión:", error);
+        if (error && error.error && error.error.message) {
+          //this.messageError = error.error.message; 
+          console.log("Mensaje: error al crear Carrera", error.error.message);
+        } else {
+          console.log("Error desconocido");
+        }
+      }
+    }));
+  }
+
+
+
+//////////////////////////////////////////////////////////
+
 
   logoutUser(){
     this.showSpinner = true;
@@ -87,140 +328,37 @@ export class MenuComponent {
     }));
   }
 
-  getNamesCareer(){
-    this.showSpinner = true;
-    this.subs.add(this.menuService.getNamesCareer().subscribe({
-      next: (namesCareer) => {
-        this.showSpinner = false;
-        this.namesCareer = namesCareer;
-      },
-      error: (error) => {
-        this.showSpinner = false;
-        console.log("error getCategories: " + error);
-      }
-    }));
-  }
 
-  selectCareer(){
-    this.showSpinner = true;
-    this.subs.add(this.menuService.getCareer(this.nameCareer).subscribe({
-      next: (career) => {
-        this.showSpinner = false;
-        this.career = career
-      },
-      error: (error) => {
-        this.showSpinner = false;
-        console.log("error getCategories: " + error);
-      }
-    }));
-  }
 
-  yearSelect: number = 0;
-  selectYear(){
-    this.career.years.forEach(year => {
-
-      if (year.year == this.yearSelect){
-          this.year = year;
-          console.log(this.year);
-      }
-    });
-  }
-
-  selectSubject(){
-    this.year.subjects.forEach(subject => {
-
-      if (subject.code == this.subject.code){
-          this.subject = subject;
-          console.log(this.subject);
-      }
-    });
-  }
-
-  createCareer(){
-    if(this.validate()){
-      /* this.showSpinner = true;
-      this.showMessageError = false; */
-      this.subs.add(this.menuService.createCareer(this.career).subscribe({
-        next: (career) => {
-          this.career = career;
-          console.log(career.name)
-          this.year = career.years[0];
-          //this.subject = career.years[0].subjects[0]
-          this.getNamesCareer();
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          /* this.showMessageError = true;
-          this.severetyMessage = 'error' */
-        }
-      }));
-    }
-  }
-
-  editCareer(){
-    if(this.validate()){
-      /* this.showSpinner = true;
-      this.showMessageError = false; */
-      this.subs.add(this.menuService.editCareer(this.career, this.nameCareer).subscribe({
-        next: (career) => {
-          this.career = career
-          this.getNamesCareer();
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          /* this.showMessageError = true;
-          this.severetyMessage = 'error' */
-        }
-      }));
-    }
-  }
-
-  addYear(){
-    let existYear:boolean = false;
-    this.career.years.forEach(year => {
-      if(year.year == this.year.year){
-        existYear = true;
-      }
-    });
-    if(!existYear){
-      let newYear: Year = {
-        id: 0,
-        year: this.year.year,
-        subjects: []
-      }
-      this.career.years.push(newYear);
-      this.yearSelect = newYear.year
-      console.log(this.career);
-    }
-    this.editCareer();
-  }
-
-  editYear(){
-    this.career.years.forEach(year => {
-      if(year.year == this.yearSelect){
-        year.year = this.year.year;
-        this.yearSelect = year.year;
-      }
-    });
-    console.log('year', this.career)
-    this.editCareer();
-  }
 
   validate(){
     return true
+  }
+
+  allFalse(){
+    this.showCareer = false;
+    this.showEditCareer = false;
+    this.showCreateCareer = false;
+    this.showYear = false;
+    this.showEditYear = false;
+    this.showCreateYear = false;
+    this.showSubject = false;
+    this.showCreateSubject = false;
+    this.showEditSubject = false;
+  }
+
+  showYears(){
+    this.allFalse();
+    this.showYear = true;
+  }
+
+  showCareers(){
+    this.allFalse();
+    this.showCareer = true;
+  }
+
+  showSubjects(){
+    this.allFalse();
+    this.showSubject = true;
   }
 }

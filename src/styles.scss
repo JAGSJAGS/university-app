@@ -78,3 +78,20 @@ input:focus {
 ::placeholder {
     color: #afafaf; /* Puedes cambiar "red" por el color que desees */
 }
+
+.modalAnimation {
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.25s;
+    animation-name: zoom;
+    animation-duration: 0.25s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)}
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)}
+    to {transform:scale(1)}
+}

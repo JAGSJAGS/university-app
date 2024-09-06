@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
 import { Storage } from '@ionic/storage-angular';
 import { Observable } from 'rxjs';
+import { Careers } from '../../interfaces/Career';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +17,9 @@ export class HomeService {
     private storage: Storage
   ) { }
 
-  getNamesCareer():Observable<string[]>{
-    let url = `${ this.apiUrl }/get_json_files`;
-    return this.http.get<string[]>( url );
+  getCareers():Observable<Careers>{
+    let url = `${ this.apiUrl }/get_careers`;
+    return this.http.get<Careers>( url );
   }
 
   private getToken(): Promise<string | null> {
