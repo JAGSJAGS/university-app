@@ -74,19 +74,20 @@
 
 <div class="container">
   <div class="menu-container">
+    <i class="pi pi-arrow-left" style="font-size: 2rem" [routerLink]="['/home']"></i>  
     <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>  
-    <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>  
-    <div>
+    <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
+    <!-- <div>
       <i class="pi pi-file-plus" style="font-size: 2rem" (click)="newYear()"></i>
       <input type="file" (change)="onFileSelected($event)" />
-    </div>
+    </div> -->
   </div><br>
   <h5>{{this.career.name}}</h5><br>
   <div class="table">
     <div class="p-table" *ngFor="let year of career.years">
       <div class="title-year"> 
         {{year.year + " " + "year" + "   "}} 
-        <i class="pi pi-times" (click)="deleteYearById(year.year)"></i>
+        <i class="pi pi-times" (click)="deleteYearById(year.id)"></i>
       </div>
       <p-table [value]="year.subjects">
         <ng-template pTemplate="header">
@@ -105,23 +106,23 @@
                 <div (click)="showSubject(subject.id, 1)" class="subject" [id]="'small' + subject.id" [style]="changeStyle(subject.quarts)">
                   {{this.paintFailSubject(subject.id, subject.fail, 'small', subject.validate)}}
                   {{subject.name}}
-                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.id, year.year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
-                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.id, year.year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
+                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject, year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
+                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
                 </div>
 
                 <div  class="subject bigSubject" [id]="'big' + subject.id" >
-                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject.id, year.year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
+                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject, year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
                   <i class="pi pi-minus exit" (click)="showSubject(subject.id, 2)"></i>
                   {{subject.name}} <br>
                   Credits: {{subject.credit}}
                   <!-- {{this.paintValidateSubject(subject.code, subject.validate, 'big')}} -->
                   {{this.paintFailSubject(subject.id, subject.fail, 'big', subject.validate)}}
-                  <div class="container-button">
-                    <button   class="button-validate" (click)="validate(year.year, subject.id)">Validate</button>
-                    <button class="button-fail" (click)="fail(subject.id, year.year, !subject.fail)" *ngIf="!subject.fail">Fail</button>
-                    <button class="button-fail" (click)="fail(subject.id, year.year, !subject.fail)" *ngIf="subject.fail">Pass</button>
+                  <div class="container-button" *ngIf="subject.id>0">
+                    <button   class="button-validate" (click)="validate(year, subject.id)" >Validate</button>
+                    <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.fail && subject.id>0">Fail</button>
+                    <button class="button-fail" (click)="fail(subject, year); showSubject(subject.id, 2)" *ngIf="subject.fail && subject.id>0">Pass</button>
                   </div>
-                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject.id, year.year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
+                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
                 </div>
               </td>
             </tr>        
@@ -137,7 +138,7 @@
         <div class="quarts-botom2" *ngIf="this.suma(allHoursQuarts(year.subjects, 0), allHoursQuarts(year.subjects, 1),allHoursQuarts(year.subjects, 2),allHoursQuarts(year.subjects, 3))<=60">
           {{this.suma(allHoursQuarts(year.subjects, 0), allHoursQuarts(year.subjects, 1),allHoursQuarts(year.subjects, 2),allHoursQuarts(year.subjects, 3))}}
         </div>
-        <div style="color: brown;" class="quarts-botom2" *ngIf="this.suma(allHoursQuarts(year.subjects, 0), allHoursQuarts(year.subjects, 1),allHoursQuarts(year.subjects, 2),allHoursQuarts(year.subjects, 3))>=60">
+        <div style="color: brown;" class="quarts-botom2" *ngIf="this.suma(allHoursQuarts(year.subjects, 0), allHoursQuarts(year.subjects, 1),allHoursQuarts(year.subjects, 2),allHoursQuarts(year.subjects, 3))>60">
           {{this.suma(allHoursQuarts(year.subjects, 0), allHoursQuarts(year.subjects, 1),allHoursQuarts(year.subjects, 2),allHoursQuarts(year.subjects, 3))}}
           <div style="font-size: 12px">
             (max 72)

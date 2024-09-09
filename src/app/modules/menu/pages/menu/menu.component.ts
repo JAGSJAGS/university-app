@@ -487,6 +487,25 @@ editSubject(){
   }
 }
 
+deleteSubject(id: number){
+  this.subs.add(this.menuService.deleteSubject(id).subscribe({
+    next: (subject) => {
+      this.getSubjects();
+      this.getAllSubjects();
+    },
+    error: (error) => {
+      //this.showSpinner = false;
+      console.log("Error en el inicio de sesión:", error);
+      if (error && error.error && error.error.message) {
+        //this.messageError = error.error.message; 
+        console.log("Mensaje: error al crear Carrera", error.error.message);
+      } else {
+        console.log("Error desconocido");
+      }
+    }
+  }));
+}
+
 reverseConvertRange(num: number): number {
   let res = 0;
   

@@ -241,6 +241,20 @@ export class MenuService {
       })
     );
   }
+
+  deleteSubject(subject: number){
+    const url = `${this.apiUrl}/delete_subject`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({'Authorization': `Bearer ${token}`});
+        const options = {
+          headers: headers,
+          params: { 'id': subject }
+        };
+        return this.http.delete<any>(url, options);
+      })
+    );
+  }
   /* createCareer( nameCareer: string):Observable<Career>{
     let url = `${ this.apiUrl }/create_json_file`;
 

@@ -181,18 +181,66 @@ export class PanelComponent {
     this.renderer.setStyle(subject, 'background-color', color); 
   }
 
-  moveSubjectYear(subjectCode: number, yearId: number, position: string){
+  moveSubjectYear(subject: Subject, year: Year, position: string){
     if(position === "right"){
-      if(this.existYear(yearId + 1)){
-        this.deleteSubjectYear(subjectCode, yearId, yearId + 1)
+      if(this.existYear(year.year + 1)){
+        //this.deleteSubjectYear(subjectCode, yearId, yearId + 1)
+        this.moveRigth(subject, year);
       }
     }
     else{
-      if(this.existYear(yearId - 1)){
-        this.deleteSubjectYear(subjectCode, yearId, yearId - 1)
+      if(this.existYear(year.year - 1)){
+        //this.deleteSubjectYear(subjectCode, yearId, yearId - 1)
+        this.moveLeft(subject, year);
       }
     }
   }
+  moveRigth(subject: Subject, year: Year){
+    this.career.years.forEach(yea => {
+
+      console.log(yea)
+      if (yea.year=== year.year) {
+        yea.subjects = yea.subjects.filter(sub => sub.id !== subject.id );
+      }
+      if (yea.year === year.year + 1) {
+        yea.subjects.unshift(subject)
+      }
+      
+    });
+  }
+
+  moveLeft(subject: Subject, year: Year){
+    this.career.years.forEach(yea => {
+
+      if (yea.year === year.year) {
+        yea.subjects = yea.subjects.filter(sub => sub.id !== subject.id );
+      }
+      if (yea.year === year.year - 1) {
+        yea.subjects.unshift(subject); 
+      }
+      
+    });
+  }
+
+  paint(){
+    this.career.years.forEach(year => {
+      // Copiamos los subjects como array, no objeto
+      let subjects = [...year.subjects]; // Asegúrate de que 'year.subjects' sea un array
+      year.subjects.forEach(subject => {
+        for (let sub of subjects) {
+          if (sub.requirements.includes(subject.id)) {
+            let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subject.id);
+            let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subject.id);
+            this.renderer.removeClass(subjectRend, 'highlight-important2');
+            this.renderer.removeClass(subjectRend1, 'highlight-important2');
+            this.renderer.addClass(subjectRend, 'highlight-important');
+            this.renderer.addClass(subjectRend1, 'highlight-important');
+          }
+        }
+      });
+    });
+  }
+  
 
   deleteSubjectYear(subjectCode: number, yearInitialId: number, yearFinalId: number){
     let subjectToMove: any = null;
@@ -220,11 +268,11 @@ export class PanelComponent {
     return this.career.years.some(year => year.year === yearId)
   }
 
-  validate(yearId: number, subjectCode: string){
+  validate(yearId: Year, subjectCode: number){
     this.career.years.forEach(year => {
-      if (year.year === yearId) {
+      if (year.year === yearId.year) {
         year.subjects.forEach(subject =>{
-          if(subject.code == subjectCode){
+          if(subject.id == subjectCode){
             if(subject.validate === true){
               subject.validate = false;
             }
@@ -237,23 +285,87 @@ export class PanelComponent {
     });
   }
 
-  fail(subjectCode: number, yearId: number, fail: boolean){
-    if(fail){
-      if(this.existYear(yearId + 1)){
-        this.changeBooleanFail(subjectCode, yearId);
-        this.deleteSubjectYear(subjectCode, yearId, yearId + 1);
-        this.requirementSubject(subjectCode, fail);
-        //console.log('añoFail', subjectCode)
+  fail(subject: Subject, year: Year){
+    
+    if(!subject.fail){
+      if(this.existYear(year.year + 1)){
+        this.changeBooleanFail(subject, year.id);
+        this.addFail(subject, year);
       }
     }
     else{
-      if(this.existYear(yearId - 1)){
-        this.requirementSubject(subjectCode, fail);
-        this.changeBooleanFail(subjectCode, yearId);
-        this.deleteSubjectYear(subjectCode, yearId, yearId - 1);
-        //console.log('añoNoFail', subjectCode)
+      this.deleteFail(subject, year)
+      if(this.existYear(year.year - 1)){
+        this.changeBooleanFail(subject, year.id);
+        this.deleteFail(subject, year)
       }
     }
+  }
+
+  addFail(subject: Subject, year: Year) {
+    let subjectNew: Subject = {...subject}
+    subjectNew.id = subject.id * -1
+    console.log(year.year + 1);
+    this.career.years.forEach(yea => {
+      if (yea.year === year.year + 1) {
+        yea.subjects.unshift(subjectNew); // Agrega el subject al inicio del array de subjects
+        this.paintSubjecFail(subjectNew.id, subjectNew.fail);
+        yea.subjects.forEach(subje => {
+          if(subje.requirements.includes(subject.id)){
+            let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subje.id);
+            let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subje.id);
+            this.renderer.removeClass(subjectRend, 'highlight-important2');
+            this.renderer.removeClass(subjectRend1, 'highlight-important2');
+            this.renderer.addClass(subjectRend, 'highlight-important');
+            this.renderer.addClass(subjectRend1, 'highlight-important');
+          }
+        })
+      }
+    });
+  }
+
+  deleteFail(subject: Subject, year: Year){
+    let subjectNew: Subject = {...subject}
+    subjectNew.id = subject.id * -1
+    this.career.years.forEach(yea => {
+      if (yea.id === year.id + 1) {
+        yea.subjects = yea.subjects.filter(sub => sub.id !== subjectNew.id );
+        yea.subjects.forEach(subje => {
+          if(subje.requirements.includes(subject.id)){
+            let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subje.id);
+            let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subje.id);
+            this.renderer.removeClass(subjectRend, 'highlight-important');
+            this.renderer.removeClass(subjectRend1, 'highlight-important');
+            this.renderer.addClass(subjectRend, 'highlight-important2');
+            this.renderer.addClass(subjectRend1, 'highlight-important2');
+          }
+        })
+      }
+      if(yea.id === year.id){
+        yea.subjects.forEach(subje => {
+          if(subje.id === subject.id){
+            subje.fail = false
+          }
+        })
+      }
+    });
+  }
+
+  paintSubjecFail(subjectCode: number, fail: boolean){
+    let subjectRend = this.elementRef.nativeElement.querySelector('#small' + subjectCode);
+    let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subjectCode);
+    /* if(fail){
+      this.renderer.removeClass(subjectRend, 'highlight-important2');
+      this.renderer.removeClass(subjectRend1, 'highlight-important2');
+      this.renderer.addClass(subjectRend, 'highlight-important');
+      this.renderer.addClass(subjectRend1, 'highlight-important');
+    }
+    else{
+      this.renderer.removeClass(subjectRend, 'highlight-important');
+      this.renderer.removeClass(subjectRend1, 'highlight-important');
+      this.renderer.addClass(subjectRend, 'highlight-important2');
+      this.renderer.addClass(subjectRend1, 'highlight-important2');
+    } */
   }
 
   requirementSubject(subjectCode: number, fail: boolean){
@@ -283,16 +395,16 @@ export class PanelComponent {
     });
   }
 
-  changeBooleanFail(subjectCode: number, yearId: number){
+  changeBooleanFail(subject: Subject, yearId: number){
     this.career.years.forEach(year => {
-      if (year.year === yearId) {
-        year.subjects.forEach(subject =>{
-          if(subject.id == subjectCode){
-            if(subject.fail === true){
-              subject.fail = false;
+      if (year.id === yearId) {
+        year.subjects.forEach(subjec =>{
+          if(subjec.id == subject.id){
+            if(subjec.fail === true){
+              subjec.fail = false;
             }
             else{
-              subject.fail = true;
+              subjec.fail = true;
             }
           }
         })  
@@ -344,7 +456,7 @@ export class PanelComponent {
   newYear(){
     let newYearId =  this.career.years[this.career.years.length - 1]?.year + 1;
     let newYear: Year = {
-      id: 0,
+      id: newYearId,
       year: newYearId,
       subjects: []
     }
@@ -352,12 +464,14 @@ export class PanelComponent {
   }
 
   deleteYearById(yearId: number) {
-    const yearIndex = this.career.years.findIndex(year => year.year === yearId);
+    const yearIndex = this.career.years.findIndex(year => year.id === yearId);
     if (yearIndex !== -1) {
+      if(!this.existYear(yearId+1)){
         this.career.years.splice(yearIndex, 1);
+      }
     }
   }
-  
+
   /* requirementSubjects2(subjectCode: number){
 
     this.career.years.forEach(year => {

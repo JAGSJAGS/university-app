@@ -58,7 +58,9 @@
                     <i class="pi pi-arrow-left" (click)="showCareers()"></i>
                 </div>
                 <br>
+                <p>{{this.career.name}}</p>
                 <div class="title-career">
+                    
                     <h5>Years</h5>
                     <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
                 </div>
@@ -109,6 +111,7 @@
                     <i class="pi pi-arrow-left" (click)="this.showYears()"></i>
                 </div>
                 <br>
+                <p>Year:{{this.year.year}}</p>
                 <div class="title-career">
                     <h5>Subjects</h5>
                     <i class="pi pi-plus-circle" (click)="this.selectCreateSubject()"></i>  
@@ -118,7 +121,7 @@
                     <p>{{subject.name}}</p>
                     <div class="icons">
                         <i class="pi pi-file-edit" (click)="selectEditSubject(subject)"></i> 
-                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;"></i>
+                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="deleteSubject(subject.id)"></i>
                     </div>
                 </div>
             </div>
@@ -227,7 +230,7 @@
         <div class="message modalAnimation">
             <div class="exit" (click)="this.showDeleteCareer = false"><i class="pi pi-times"></i></div>
             <br>
-            <p>Esta seguro</p>
+            <p>Are you sure you want to delete?</p>
             <br>
             <div class="button"><button (click)="deleteCareer()">Delete</button></div>
         </div>
@@ -236,7 +239,7 @@
         <div class="message modalAnimation">
             <div class="exit" (click)="this.showDeleteYear = false"><i class="pi pi-times"></i></div>
             <br>
-            <p>Delete Year</p>
+            <p>Are you sure you want to delete?</p>
             <br>
             <div class="button"><button (click)="deleteYear()">Delete</button></div>
         </div>
