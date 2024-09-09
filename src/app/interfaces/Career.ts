@@ -1,11 +1,11 @@
 export interface Subject {
-    id: string;
+    id: number;
     name: string;
     code: string;
-    quarts: string[];
+    quarts: number[];
     validate: boolean,
     fail: boolean,
-    requirement: string [],
+    requirements: number [],
     credit: number
 }
 
@@ -27,5 +27,9 @@ export interface Careers {
 
 export interface Years{
     data: Year[]
+}
+
+export interface Subjects{
+    data: Subject[]
 }
 

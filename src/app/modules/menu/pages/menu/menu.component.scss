@@ -45,6 +45,7 @@
     padding: 3%;
     box-shadow: 0px 0px 20px 5px #0000002d;
     background-color: #f2f4f9;
+    margin-bottom: 10vh;
     .menu-top{
         width: 100%;
         display: flex;
@@ -161,5 +162,20 @@
                 background-color: #b41f1f;
             }
         }
+    }
+}
+
+.quarts{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border: 1px solid black;
+    border-top: none;
+    margin-top: 5px;
+    p{
+        width: 25%;
+        text-align: center;
+        border-right: 1px solid black;
+        padding: 5px 0px;
     }
 }

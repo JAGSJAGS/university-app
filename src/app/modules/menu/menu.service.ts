@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment.prod';
 import { from, Observable, switchMap } from 'rxjs';
-import { Career, Careers, Year } from '../../interfaces/Career';
+import { Career, Careers, Subject, Subjects, Year } from '../../interfaces/Career';
 
 @Injectable({
   providedIn: 'root'
@@ -159,13 +159,88 @@ export class MenuService {
     return this.http.get<any[]>( url );
   }
 
-  
-
-  getCareer(file_name: string):Observable<Career>{
-    let url = `${ this.apiUrl }/get_json_file`;
-    return this.http.post<Career>( url, {'file_name': file_name});
+  getSubjects(year: Year): Observable<any> {
+    let url = `${this.apiUrl}/get_subjects`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        let options = {
+          headers,
+          params: {
+            'year_id': year.id
+          }
+        };
+        return this.http.get<any>(url, options);
+      })
+    );
   }
 
+  getAllSubjects(career: Career): Observable<Subjects> {
+    let url = `${this.apiUrl}/get_all_subjects`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        let options = {
+          headers,
+          params: {
+            'career_id': career.id
+          }
+        };
+        return this.http.get<Subjects>(url, options);
+      })
+    );
+  }
+
+  createSubject( subject: Subject, year: Year):Observable<any>{
+    let url = `${ this.apiUrl }/create_subject`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<any>(url, 
+        { 
+          "year_id": year.id,
+          "name": subject.name,
+          "code": subject.code,
+          "credit": subject.credit,
+          "quarts": subject.quarts,
+          "requirements": subject.requirements
+        },
+        {
+          headers
+        });
+      })
+    );
+  }
+
+  updateSubject( subject: Subject, year: Year):Observable<any>{
+    let url = `${ this.apiUrl }/update_subject`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<any>(url, 
+        { 
+          "id": subject.id,
+          "year_id": year.id,
+          "name": subject.name,
+          "code": subject.code,
+          "credit": subject.credit,
+          "quarts": subject.quarts,
+          "requirements": subject.requirements
+        },
+        {
+          headers
+        });
+      })
+    );
+  }
   /* createCareer( nameCareer: string):Observable<Career>{
     let url = `${ this.apiUrl }/create_json_file`;
 

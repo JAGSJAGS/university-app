@@ -7,6 +7,8 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 import { ToastModule } from 'primeng/toast';
 import { MessagesModule } from 'primeng/messages';
 import { DropdownModule } from 'primeng/dropdown';
+import { SliderModule } from 'primeng/slider';
+import { ListboxModule } from 'primeng/listbox';
 
 
 @NgModule({
@@ -21,7 +23,9 @@ import { DropdownModule } from 'primeng/dropdown';
     PanelMenuModule,
     ToastModule,
     MessagesModule,
-    DropdownModule
+    DropdownModule,
+    SliderModule,
+    ListboxModule
   ]
 })
 export class PrimeNgModule { }
