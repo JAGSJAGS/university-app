@@ -208,6 +208,7 @@ export class MenuService {
           "name": subject.name,
           "code": subject.code,
           "credit": subject.credit,
+          "link": subject.link,
           "quarts": subject.quarts,
           "requirements": subject.requirements
         },
@@ -232,6 +233,7 @@ export class MenuService {
           "name": subject.name,
           "code": subject.code,
           "credit": subject.credit,
+          "link": subject.link,
           "quarts": subject.quarts,
           "requirements": subject.requirements
         },

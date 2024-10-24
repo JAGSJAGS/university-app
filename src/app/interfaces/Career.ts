@@ -6,7 +6,14 @@ export interface Subject {
     validate: boolean,
     fail: boolean,
     requirements: number [],
-    credit: number
+    credit: number,
+    link: string,
+    group: Group[]
+}
+
+export interface Group {
+    id: number,
+    name: string
 }
 
 export interface Year {

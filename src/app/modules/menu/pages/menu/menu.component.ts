@@ -74,7 +74,12 @@ export class MenuComponent {
     validate: false,
     fail: false,
     requirements:  [],
-    credit: 0
+    link: "",
+    credit: 0,
+    group: [{
+      id: 0,
+      name: ""
+    }]
   }
 
   constructor(
@@ -388,7 +393,12 @@ selectCreateSubject(){
     validate: false,
     fail: false,
     requirements:  [],
-    credit: 0
+    link: "",
+    credit: 0,
+    group: [{
+      id: 0,
+      name: ""
+    }]
   }
 }
 
@@ -423,7 +433,12 @@ createSubject(){
           validate: false,
           fail: false,
           requirements:  [],
-          credit: 0
+          link: "",
+          credit: 0,
+          group: [{
+            id: 0,
+            name: ""
+          }]
         }
         this.getSubjects();
       },

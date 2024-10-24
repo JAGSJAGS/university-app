@@ -1,5 +1,5 @@
-import { Component, ElementRef, Renderer2 } from '@angular/core';
-import { Career, Subject, Year } from '../../../../interfaces/Career';
+import { AfterViewInit, Component, ElementRef, Renderer2 } from '@angular/core';
+import { Career, Group, Subject, Year } from '../../../../interfaces/Career';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../auth.service';
 import { Subscription } from 'rxjs';
@@ -9,9 +9,12 @@ import { Subscription } from 'rxjs';
   templateUrl: './panel.component.html',
   styleUrl: './panel.component.scss'
 })
-export class PanelComponent {
+export class PanelComponent{
 
   subs: Subscription = new Subscription();
+
+  showSubjectInformation: string = "";
+  private unlisten: () => void;
 
   career: Career = {
     id:0,
@@ -25,9 +28,14 @@ export class PanelComponent {
           code: "",
           quarts: [1, 4],
           validate: false,
+          link: "",
           fail: false,
           requirements:  [],
-          credit: 0
+          credit: 0,
+          group: [{
+            id: 0,
+            name: ""
+          }]
         }
       ]
     }]
@@ -43,10 +51,15 @@ export class PanelComponent {
     private renderer: Renderer2,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService
-  ) { }
+  ) { 
+    this.unlisten = this.renderer.listen('document', 'DOMContentLoaded', () => {
+      this.ifs();
+    });
+  }
 
   ngOnInit(): void {
     this.initLoad();
+    
   }
   initLoad(){
     this.activatedRoute.params.subscribe(({ id }) => {
@@ -54,12 +67,16 @@ export class PanelComponent {
     });
   }
 
+
   getCareer(id: number){
     this.subs.add(this.authService.getCareer(id).subscribe({
       next: (career) => {
         this.career = career.data;
         this.careerBack = career.data;
         console.log(this.career);
+        setTimeout(() => {
+          this.ifs();
+        }, 1000);
       },
       error: (error) => {
         if (error && error.error && error.error.message) {
@@ -91,6 +108,34 @@ export class PanelComponent {
         }
       }));
   } */
+
+  ifs(){
+    console.log('dfsadfas')
+    this.career.years.forEach(year => {
+        year.subjects.forEach(subject => {
+          let years = [...this.career.years];
+          years.forEach(year2 =>{
+            year2.subjects.forEach(subject2 =>{
+              if(year.id !== year2.id){
+                if(subject.group.length > 0){
+                  if(subject2.group.some(group => group.id === subject.group[0].id)){
+                    console.log(subject.id)
+                    let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'small' + subject.id);
+                    //this.renderer.removeClass(subjectRender, 'highlight-important2');
+                    this.renderer.addClass(subjectRender, 'borderRed');
+                  }
+                  else{
+                    let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'small' + subject.id);
+                    //this.renderer.removeClass(subjectRender, 'highlight-important2');
+                    this.renderer.addClass(subjectRender, 'highlight-important2');
+                  }
+                }
+              }
+            })
+          })
+        })
+    });
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -181,6 +226,48 @@ export class PanelComponent {
     this.renderer.setStyle(subject, 'background-color', color); 
   }
 
+  paintGroupSubject(groupf: Group[], year_id: number){
+    if(groupf.length > 0){
+      this.career.years.forEach(yea => {
+        if (yea.id=== year_id) {
+          yea.subjects.forEach(subject => {
+            if(subject.group.some(group => group.id === groupf[0].id)){
+              this.paintBorderSubject(subject.id)
+            }
+          })
+        }
+      });
+    }
+  }
+
+  paintBorderSubject(subjectId: number){
+    let subject = this.elementRef.nativeElement.querySelector('#' + 'small' + subjectId);
+    //let subject2 = this.elementRef.nativeElement.querySelector('#' + 'big' + subjectId);
+    this.renderer.setStyle(subject, 'border', 'solid 2px #ffff00');
+    //this.renderer.setStyle(subject2, 'border', 'solid 2px #ffff00');
+  }
+
+  unPaintGroupSubject(groupf: Group[], year_id: number){
+    if(groupf.length > 0){
+      this.career.years.forEach(yea => {
+        if (yea.id=== year_id) {
+          yea.subjects.forEach(subject => {
+            if(subject.group.some(group => group.id === groupf[0].id)){
+              this.unPaintBorderSubject(subject.id)
+            }
+          })
+        }
+      });
+    }
+  }
+
+  unPaintBorderSubject(subjectCode: number){
+    let subject = this.elementRef.nativeElement.querySelector('#' + 'small' + subjectCode);
+    //let subject2 = this.elementRef.nativeElement.querySelector('#' + 'big' + subjectCode);
+    this.renderer.setStyle(subject, 'border', 'none');
+    //this.renderer.setStyle(subject2, 'border', 'none');
+  }
+
   moveSubjectYear(subject: Subject, year: Year, position: string){
     if(position === "right"){
       if(this.existYear(year.year + 1)){
@@ -194,6 +281,7 @@ export class PanelComponent {
         this.moveLeft(subject, year);
       }
     }
+    this.ifs();
   }
   moveRigth(subject: Subject, year: Year){
     this.career.years.forEach(yea => {
@@ -419,7 +507,7 @@ export class PanelComponent {
         res = this.hoursQuart(subject.quarts, subject.credit)[i] + res;
       }
     }
-    return Math.trunc(res);
+    return Math.round(res);
   }
 
   hoursQuart(quarts: number[], hours: number){
