@@ -1,18 +1,20 @@
 .container{
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  min-width: 100%;
+  min-height: 100vh;
   padding-top: 10vh;
   align-items: center;
+  padding-bottom: 10vh;
+}
+.container-table{
+  min-width: 90%;
+  margin: 0 5%;
 }
 .table{
-  width: 90%;
   display: flex;
   flex-direction: row;
   white-space: nowrap; /* Evita que los elementos se envuelvan */
-  overflow-x: scroll;
-  overflow-y: hidden;
+  background-color: #FAFAFC;
+  margin-right: 5vw;
 }
 .title-year{
   text-align: center;
@@ -21,6 +23,8 @@
   font-size: 20px;
   border-bottom: solid 1px #c6c6c6;
   position: relative;
+  background-color: #F5F5F7;
+  
   i{
     position: absolute;
     top: 0;
@@ -32,7 +36,7 @@
   }
 }
 .p-table{
-  width: 31%;
+  width: 30vw;
   min-height: 65vh;
   margin-left: 5px;
   flex: 0 0 auto; /* Evita que los elementos se redimensionen */
@@ -45,6 +49,7 @@
   flex-direction: row;
   padding: 0%;
   height: 5vh;
+  background-color: #F5F5F7;
 }
 .quarts-botom{
   position: absolute;
@@ -55,6 +60,7 @@
   height: 5vh;
   width: 100%;
   border-top: #c6c6c6 solid 1px;
+  background-color: #F5F5F7;
 }
 .quarts-botom2{
   position: absolute;
@@ -67,6 +73,7 @@
   height: 5vh;
   width: 100%;
   border-top: #c6c6c6 solid 1px;
+  background-color: #F5F5F7;
 }
 .quart{
   width: 25%;
@@ -86,13 +93,12 @@
   text-overflow: ellipsis;
   border-radius: 5px;
   color: #ffffff;
-  background-color: #008e64;
   position: relative;
 }
 .subject-information{
   width: 100%;
-  background-color: #ffffff;
-  border: solid 1px black;
+  background-color: #F5F5F7;
+  border: solid 1px #c6c6c6;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -112,7 +118,7 @@
 }
 .bigSubject{
   width: 100%;
-  background-color: #00ae8e;
+  background-color: #539453;
   display: none;
   flex-direction: column;
   align-items: center;
@@ -173,7 +179,7 @@
   align-items: center;
   justify-content: space-evenly;
   i{
-    color: #2d2d81;
+    color: #171717;
   }
   width: 90%;
   margin-bottom: 5px;
@@ -183,7 +189,7 @@
   background-color: #7c3a3ab4;
 }
 .highlight-important2 {
-  background-color: #009172;
+  background-color: #007e67;
 }
 .highlight-important3 {
   background-color: #918300;
@@ -192,8 +198,8 @@
   border: solid 3px #ffff00;
 }
 .highlight-important5 {
-  background-color: #918300;
+  background-color: #d7531b;
 }
 .borderRed{
-  background-color:  #ff2200;
+  background-color:  #b15e5192;
 }

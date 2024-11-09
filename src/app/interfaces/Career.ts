@@ -8,7 +8,9 @@ export interface Subject {
     requirements: number [],
     credit: number,
     link: string,
-    group: Group[]
+    group: Group[],
+    groups: number [],
+    critic: boolean
 }
 
 export interface Group {

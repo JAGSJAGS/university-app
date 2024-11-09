@@ -4,14 +4,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #F9FAFB;
 }
 .container-login{
     width: 32%;
     border-radius: 20px;
     padding: 0% 3% 3% 3%;
     box-shadow: 0px 0px 20px 5px #0000002d;
-    background-color: #F9FAFB;
+    background-color: #F5F5F7;
 }
 .button-select{
     margin-top: 2%;
@@ -31,4 +30,8 @@
     button{
         padding: 1.5vh 1.5vw;
     }
+}
+img{
+    width: 80%;
+    margin-left: 10%;
 }

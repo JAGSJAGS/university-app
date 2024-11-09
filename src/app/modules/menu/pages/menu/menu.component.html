@@ -1,4 +1,4 @@
-<div class="button-closse"><button  (click)="logoutUser()">Closse Menu</button></div>
+<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
 
 <div class="container">
     <div class="container-show-career">
@@ -62,7 +62,10 @@
                 <div class="title-career">
                     
                     <h5>Years</h5>
-                    <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
+                    <div style="display: flex;  flex-direction: row;">
+                        <button style="margin-right: 5px;" (click)="this.showAllYears = true; this.getAllYears();">Clone Year</button>
+                        <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
+                    </div>
                 </div>
                 <br>
                 <div class="career" *ngFor="let year of this.years.data ">
@@ -114,11 +117,18 @@
                 <p>Year:{{this.year.year}}</p>
                 <div class="title-career">
                     <h5>Subjects</h5>
-                    <i class="pi pi-plus-circle" (click)="this.selectCreateSubject()"></i>  
+                    <div>
+                        <i class="pi pi-plus-circle" (click)="this.selectCreateSubject()"></i>  
+                    </div> 
                 </div>
                 <br>
+                
                 <div class="career" *ngFor="let subject of this.subjects.data ">
-                    <p>{{subject.name}}</p>
+                    <div style="display: flex; flex-direction: row;">
+                        <i class="pi pi-angle-double-down" (click)="order('down', this.subjects, subject)"></i> 
+                        <i class="pi pi-angle-double-up" style="margin-right: 20px;" (click)="order('up', this.subjects, subject)"></i>
+                        <p>{{subject.name}}</p>
+                    </div>
                     <div class="icons">
                         <i class="pi pi-file-edit" (click)="selectEditSubject(subject)"></i> 
                         <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="deleteSubject(subject.id)"></i>
@@ -175,6 +185,31 @@
                         </div>
                     </div>
                     <br>
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <p>Seleccione Grupo</p>
+                            <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">New Group</p>
+                            </div>
+                        </div>  
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.selectsGroups" style="margin: 5px;" >
+                                <div class="" style="display: flex; flex-direction: row; justify-content: space-between; border: solid 1px #c1c1c1;; background-color: #F3F4F9; padding: 5px; align-items: center;">
+                                    <div (click)="selectsGroupsSubject(subject, group)" style="background-color: #464696;  border-radius: 10px; max-width: 30vw; "><p style="color: white; padding: 10px;">{{group.name}}</p></div>
+                                    <i (click)="this.groupDeleteId = group.id; this.showDeleteGroup = true" class="pi pi-trash" style="color: brown; margin-left: 5px; margin-right: 10px; font-size: 20px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <p>Grupo seleccionado</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.selectsNoGroups" style="margin: 5px;">
+                                <button (click)="selectsGroupsSubject(subject, group)" style="padding: 10px; background-color: #46966e;">{{group.name}}</button>
+                            </div>
+                        </div>
+                    </div><br>
                     <div class="button"><button type="submit">Edit Subject</button></div> 
                 </form>
             </div>
@@ -226,6 +261,33 @@
                             </div>
                         </div>
                     </div>
+                    <br><br>
+
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <p>Seleccione Grupo</p>
+                            <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">New Group</p>
+                            </div>
+                        </div>  
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.groups" style="margin: 5px;" >
+                                <div class="" style="display: flex; flex-direction: row; justify-content: space-between; border: solid 1px #c1c1c1;; background-color: #F3F4F9; padding: 5px; align-items: center;">
+                                    <div (click)="selectGroup(group.id, group.name)" style="background-color: #464696;  border-radius: 10px; max-width: 30vw; "><p style="color: white; padding: 10px;">{{group.name}}</p></div>
+                                    <i (click)="this.groupDeleteId = group.id; this.showDeleteGroup = true" class="pi pi-trash" style="color: brown; margin-left: 5px; margin-right: 10px; font-size: 20px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <p>Grupo seleccionado</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.groupSelect" style="margin: 5px;">
+                                <button (click)="deselectGroup(group.id)" style="padding: 10px; background-color: #46966e;">{{group.name}}</button>
+                            </div>
+                        </div>
+                    </div>
                     <br>
                     <div class="button"><button type="submit">Create Subject</button></div> 
                 </form>
@@ -250,6 +312,46 @@
             <p>Are you sure you want to delete?</p>
             <br>
             <div class="button"><button (click)="deleteYear()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showNewGroup">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showNewGroup = false"><i class="pi pi-times"></i></div>
+            <br>
+            <h5>New Group</h5>
+            <br>
+            <form (ngSubmit)="this.createGroup()" #loginForm="ngForm"> 
+                <div class="form-group input">
+                    <p>Name</p>
+                    <input type="text" id="name" name="nameEdit" [(ngModel)]="this.nameGroup" required placeholder="Name">
+                </div>
+                <br>
+                <div class="button"><button type="submit" style="background-color: #46966e;">Create Group</button></div> 
+            </form>
+        </div>
+    </div>
+    <div class="container-mesaage" *ngIf="this.showDeleteGroup" (click)="this.showDeleteGroup = false">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showDeleteGroup = false"><i class="pi pi-times"></i></div>
+            <br>
+            <p>Are you sure you want to delete?</p>
+            <br>
+            <div class="button"><button (click)="deleteGroup()">Delete Group</button></div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showAllYears" >
+        <div class="message modalAnimation" style="width: 60%; height: 60%;">
+            <div class="exit" (click)="this.showAllYears = false"><i class="pi pi-times"></i></div>
+            <br>
+            <h5>Select Year for clone</h5>
+            <br>
+            <div style="width: 100%; max-height:80%; background-color: white; display: flex; flex-wrap: wrap; overflow-y: auto; align-items: start;">
+                <div *ngFor="let year of allYears" >
+                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career}}, Year: {{year.year}}</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

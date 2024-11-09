@@ -22,6 +22,21 @@ export class MenuService {
     return this.http.get<Careers>( url );
   }
 
+  getAllYears():Observable<Careers>{
+    let url = `${this.apiUrl}/get_all_years`
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        let options = {
+          headers
+        };
+        return this.http.get<any>(url, options);
+      })
+    );
+  }
+
   updateCareer( career: Career):Observable<any>{
     let url = `${ this.apiUrl }/update_career`;
 
@@ -195,7 +210,7 @@ export class MenuService {
     );
   }
 
-  createSubject( subject: Subject, year: Year):Observable<any>{
+  createSubject( subject: Subject, year: Year, groups: number []):Observable<any>{
     let url = `${ this.apiUrl }/create_subject`;
     return from(this.getToken()).pipe(
       switchMap(token => {
@@ -210,7 +225,8 @@ export class MenuService {
           "credit": subject.credit,
           "link": subject.link,
           "quarts": subject.quarts,
-          "requirements": subject.requirements
+          "requirements": subject.requirements,
+          "groups": groups
         },
         {
           headers
@@ -219,7 +235,7 @@ export class MenuService {
     );
   }
 
-  updateSubject( subject: Subject, year: Year):Observable<any>{
+  updateSubject( subject: Subject, year: Year, groups: number []):Observable<any>{
     let url = `${ this.apiUrl }/update_subject`;
     return from(this.getToken()).pipe(
       switchMap(token => {
@@ -235,7 +251,28 @@ export class MenuService {
           "credit": subject.credit,
           "link": subject.link,
           "quarts": subject.quarts,
-          "requirements": subject.requirements
+          "requirements": subject.requirements,
+          "groups": groups
+        },
+        {
+          headers
+        });
+      })
+    );
+  }
+
+  orderSubject( careerId: number, year: Year, arrayId: number[]):Observable<any>{
+    let url = `${ this.apiUrl }/order_subjects`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<any>(url, 
+        { 
+          "order": arrayId,
+          "year_id": year.id,
+          "career_id": careerId
         },
         {
           headers
@@ -303,6 +340,26 @@ export class MenuService {
               "name": career.name,
               "years": career.years
           } */
+        },
+        {
+          headers
+        });
+      })
+    );
+  }
+
+  cloneYear( career_id: number, year_id: number):Observable<any>{
+    let url = `${ this.apiUrl }/clone_year`;
+
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<any>(url, 
+        { 
+          "career_id": career_id,
+          "year_id": year_id
         },
         {
           headers

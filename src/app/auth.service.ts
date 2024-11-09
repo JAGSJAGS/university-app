@@ -58,6 +58,36 @@ export class AuthService {
     );
   }
 
+  deleteGroup(id: number){
+    let url = `${this.apiUrl}/delete_group`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({'Authorization': `Bearer ${token}`});
+        let options = {
+          headers: headers,
+          params: { 'id': id }
+        };
+        return this.http.delete<any>(url, options);
+      })
+    );
+  }
+
+  userProfile(): Observable<any> {
+    let url = `${this.apiUrl}/user_profile`;
+  
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        let options = {
+          headers,
+        };
+        return this.http.get<any>(url, options);
+      })
+    );
+  }
+
   /* registerUser2( user: User):Observable<any>{
     let url = `${ this.apiUrl }/register_user`;
     return this.http.post<any>( url, {
@@ -97,6 +127,30 @@ export class AuthService {
           'Authorization': `Bearer ${token}`
         });
         return this.http.get<any>(url, { headers });
+      })
+    );
+  }
+
+  getAllGroups(): Observable<any> {
+    let url = `${ this.apiUrl }/get_all_groups`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.get<any>(url, { headers });
+      })
+    );
+  }
+
+  createGroup(name: string): Observable<any> {
+    let url = `${ this.apiUrl }/create_group`;
+    return from(this.getToken()).pipe(
+      switchMap(token => {
+        let headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return this.http.post<any>(url, {'name': name}, { headers });
       })
     );
   }
