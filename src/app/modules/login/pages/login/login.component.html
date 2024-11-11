@@ -1,7 +1,7 @@
 <div class="container">
     <div class="container-login"><br>
       <img src="../../../../../assets/img/logo.png" alt="">
-      <h4>Login</h4><br>
+      <h4>{{ "LOGIN.LOGIN" | translate}}</h4><br>
       <form (ngSubmit)="login()" #loginForm="ngForm"> 
           <div class="form-group input">
             <input type="email" id="email" name="email" [(ngModel)]="this.email" required placeholder="Email">
@@ -11,7 +11,7 @@
             <input type="password" id="password" name="password" [(ngModel)]="this.password" required placeholder="Password">
             <p *ngIf="this.showErrorPassword">{{this.passwordError}}</p>
           </div>
-          <button type="submit">Log in</button>
+          <button type="submit">{{ "LOGIN.LOGIN" | translate}}</button>
       </form>
     </div>
     <app-message [messageError]="[{ severity: this.severetyMessage, detail: this.messageError }]" *ngIf="this.showMessageError"></app-message>

@@ -4,10 +4,6 @@
     <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>
     <i class="pi pi-arrow-down" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
     <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
-    <!-- <div>
-      <i class="pi pi-file-plus" style="font-size: 2rem" (click)="newYear()"></i>
-      <input type="file" (change)="onFileSelected($event)" />
-    </div> -->
   </div><br>
   <div id="htmlContent" class="container-table">
     <h5 style="width: 100%; text-align: center;">{{this.career.name}}</h5>
@@ -15,7 +11,7 @@
   <div  class="table">
     <div class="p-table" *ngFor="let year of career.years">
       <div class="title-year"> 
-        {{year.year + " " + "jaar" + "   "}} 
+        {{year.year + " "}} {{ "PANEL.YEAR" | translate}}
         <i class="pi pi-times" (click)="deleteYearById(year.id)"></i>
       </div>
       <p-table [value]="year.subjects">
@@ -45,35 +41,19 @@
   
                   <div class="subject-information" *ngIf="showSubjectInformation === subject.id">
                     <p>{{subject.name}}</p>
-                    <p>Credits: {{subject.credit}}</p>
+                    <p>{{ "PANEL.CREDITS" | translate}}: {{subject.credit}}</p>
                     <a href="{{subject.link}}" target="_blank" rel="noopener noreferrer">{{subject.link}}</a>
-                    <p *ngIf="subject.group.length >0" style="background-color: #f6ff00;" >Group: {{subject.group[0].name}}</p>
+                    <p *ngIf="subject.group.length >0" style="background-color: #f6ff00;" >{{ "PANEL.GROUP" | translate}}: {{subject.group[0].name}}</p>
                     <div class="container-button-subject">
         
-                      <button class="button-validate" (click)="validate(subject)" *ngIf="!subject.fail" >Vrij</button>
-                      <button class="button-validate" (click)="critic(subject, year)" *ngIf="!subject.critic && year.year === 1 && !subject.fail" style="background-color: #d7531b;">Critic</button>
-                      <button class="button-validate" (click)="noCritic(subject, year)" *ngIf="subject.critic" style="background-color: #d7531b;">No Critic</button>
-                      <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.critic && !subject.fail">NG</button>
-                      <button class="button-fail" (click)="fail(subject, year); showSubject(subject.id, 2)" *ngIf="subject.fail">no NG</button>
+                      <button class="button-validate" (click)="validate(subject)" *ngIf="!subject.fail" >{{ "PANEL.VALIDATE" | translate}}</button>
+                      <button class="button-validate" (click)="critic(subject, year)" *ngIf="!subject.critic && year.year === 1 && !subject.fail" style="background-color: #d7531b;">{{ "PANEL.CRITIC" | translate}}</button>
+                      <button class="button-validate" (click)="noCritic(subject, year)" *ngIf="subject.critic" style="background-color: #d7531b;">{{ "PANEL.NOCRITIC" | translate}}</button>
+                      <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.critic && !subject.fail">{{ "PANEL.FAIL" | translate}}</button>
+                      <button class="button-fail" (click)="fail(subject, year); showSubject(subject.id, 2)" *ngIf="subject.fail">{{ "PANEL.PASS" | translate}}</button>
                     </div>  
                   </div>
                 </div>
-                
-
-                <!-- <div  class="subject bigSubject" [id]="'big' + subject.id" (mouseover)="paintGroupSubject(subject.group, year.id)" (mouseout)="unPaintGroupSubject(subject.group, year.id)">
-                  <div class="arrow arrowLeft" (click)="moveSubjectYear(subject, year, 'left')" *ngIf="!subject.fail"><i class="pi pi-angle-left"></i></div>
-                  <i class="pi pi-minus exit" (click)="showSubject(subject.id, 2)"></i>
-                  {{subject.name}} <br>
-                  Credits: {{subject.credit}}
-                  {{this.paintValidateSubject(subject.code, subject.validate, 'big')}}
-                  {{this.paintFailSubject(subject.id, subject.fail, 'big', subject.validate)}}
-                  <div class="container-button" *ngIf="subject.id>0">
-                    <button   class="button-validate" (click)="validate(year, subject.id)" >Validate</button>
-                    <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.fail && subject.id>0">Fail</button>
-                    <button class="button-fail" (click)="fail(subject, year); showSubject(subject.id, 2)" *ngIf="subject.fail && subject.id>0">Pass</button>
-                  </div>
-                  <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf="!subject.fail"><i class="pi pi-angle-right"></i></div> 
-                </div> -->
               </td>
             </tr>        
         </ng-template>

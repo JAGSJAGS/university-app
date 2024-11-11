@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage-angular';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -16,10 +17,12 @@ export class AppComponent {
   constructor(
     private storage: Storage,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ){
     this.ngOnInit();
     this.isAuth();
+    this.getLanguage();
   }
 
   async ngOnInit() {
@@ -34,5 +37,10 @@ export class AppComponent {
       error: (error) => {
       }
     }));
+  }
+
+  getLanguage(){
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
   }
 }

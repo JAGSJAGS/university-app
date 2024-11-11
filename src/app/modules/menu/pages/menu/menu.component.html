@@ -6,7 +6,7 @@
         <div class="section-career modalAnimation" *ngIf="this.showCareer">
             <div class="container-career">
                 <div class="title-career">
-                    <h5>Careers</h5>
+                    <h5>{{ "MENU.CAREER" | translate}}</h5>
                     <i class="pi pi-plus-circle" (click)="this.selectCreateCareer()"></i>  
                 </div>
                 <br>
@@ -23,22 +23,22 @@
 
             <div class="container-career modalAnimation" *ngIf="this.showEditCareer" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showEditCareer = false"></i></div>
-                <h5>Edit</h5>
+                <h5>{{ "MENU.CAREER" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="updateCareer()" #loginForm="ngForm"> 
                     <div class="form-group input">
-                        <p>Name</p>
+                        <p>{{ "MENU.NAME" | translate}}</p>
                         <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
                         <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
                     </div>
                     <br>
-                    <div class="button"><button type="submit">Edit Career</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.EDITCAREER" | translate}}</button></div> 
                 </form>
             </div>
 
             <div class="container-career modalAnimation" *ngIf="this.showCreateCareer" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showCreateCareer = false"></i></div>
-                <h5>Create Career</h5>
+                <h5>{{ "MENU.CREATECAREER" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="createCareer()" #loginForm="ngForm"> 
                     <div class="form-group input">
@@ -46,7 +46,7 @@
                         <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
                     </div>
                     <br>
-                    <div class="button"><button type="submit">Create</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.CREATE" | translate}}</button></div> 
                 </form>
             </div>
         </div>
@@ -61,9 +61,9 @@
                 <p>{{this.career.name}}</p>
                 <div class="title-career">
                     
-                    <h5>Years</h5>
+                    <h5>{{ "MENU.YEARS" | translate}}</h5>
                     <div style="display: flex;  flex-direction: row;">
-                        <button style="margin-right: 5px;" (click)="this.showAllYears = true; this.getAllYears();">Clone Year</button>
+                        <button style="margin-right: 5px;" (click)="this.showAllYears = true; this.getAllYears();">{{ "MENU.CLONE" | translate}}</button>
                         <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
                     </div>
                 </div>
@@ -80,29 +80,29 @@
 
             <div class="container-career modalAnimation" *ngIf="this.showEditYear" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showEditYear = false"></i></div>
-                <h5>Edit Years</h5>
+                <h5>{{ "MENU.EDITYEARS" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="updateYear()" #loginForm="ngForm"> 
                     <div class="form-group input">
-                        <p>Year</p>
+                        <p>{{ "MENU.YEAR" | translate}}</p>
                         <input type="number" id="yearEdit" name="yearEdit" [(ngModel)]="this.year.year" required placeholder="New Year">
                         
                     </div>
                     <br>
-                    <div class="button"><button type="submit">Edit Year</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.EDITYEAR" | translate}}</button></div> 
                 </form>
             </div>
 
             <div class="container-career modalAnimation" *ngIf="this.showCreateYear" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showCreateYear = false"></i></div>
-                <h5>Create Year</h5>
+                <h5>{{ "MENU.EDITYEAR" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="createYear()" #loginForm="ngForm"> 
                     <div class="form-group input">
                         <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="New Year">
                     </div>
                     <br>
-                    <div class="button"><button type="submit">Create Year</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.CREATEYEAR" | translate}}</button></div> 
                 </form>
             </div>
         </div>
@@ -114,9 +114,9 @@
                     <i class="pi pi-arrow-left" (click)="this.showYears()"></i>
                 </div>
                 <br>
-                <p>Year:{{this.year.year}}</p>
+                <p>{{ "MENU.YEAR" | translate}}:{{this.year.year}}</p>
                 <div class="title-career">
-                    <h5>Subjects</h5>
+                    <h5>{{ "MENU.SUBJECTS" | translate}}</h5>
                     <div>
                         <i class="pi pi-plus-circle" (click)="this.selectCreateSubject()"></i>  
                     </div> 
@@ -139,7 +139,7 @@
 
             <div class="container-career modalAnimation" *ngIf="this.showEditSubject" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showEditSubject = false"></i></div>
-                <h5>Edit Subject</h5>
+                <h5>{{ "MENU.EDITSUBJECTS" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="editSubject()" #loginForm="ngForm"> 
                     <div class="form-group input">
@@ -149,17 +149,17 @@
                         <input type="text" id="code" name="code" [(ngModel)]="this.subject.code" required placeholder="Code">
                     </div><br>
                     <div class="form-group input">
-                        <p>Credits</p>
+                        <p>{{ "MENU.CREDITS" | translate}}</p>
                         <input type="number" id="credit" name="credit" [(ngModel)]="this.subject.credit" required placeholder="Credit">
                     </div>
                     <div class="form-group input">
-                        <p>Links</p>
+                        <p>{{ "MENU.LINKS" | translate}}</p>
                         <input type="text" id="link" name="link" [(ngModel)]="this.subject.link" required placeholder="Link">
                     </div>
                     <br>
                     <br>
                     <div class="form-group input">
-                        <p>Period</p>
+                        <p>{{ "MENU.PERIOD" | translate}}</p>
                         <br>
                         <p-slider [(ngModel)]="this.rangeValues" name="quart" [range]="true" styleClass="w-14rem" />
                         <div class="quarts">
@@ -168,7 +168,7 @@
                     </div>
                     <br><br>
                     <div style="border: solid 1px black; padding: 10px; background-color: white;">
-                        <p>Seleccione las materias</p>
+                        <p>{{ "MENU.SELECTSUBJECTS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let subject of this.allSubjects.data" style="margin: 5px;">
@@ -176,7 +176,7 @@
                             </div>
                         </div>
                         <br>
-                        <p>Seleccionados</p>
+                        <p>{{ "MENU.SELECTEDSUBJECTS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let subject of this.subjectsSelected" style="margin: 5px;">
@@ -187,9 +187,9 @@
                     <br>
                     <div style="border: solid 1px black; padding: 10px; background-color: white;">
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                            <p>Seleccione Grupo</p>
+                            <p>{{ "MENU.SELECTSUBJECTGROUP" | translate}}</p>
                             <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
-                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">New Group</p>
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">{{ "MENU.NEWGROUP" | translate}}</p>
                             </div>
                         </div>  
                         <br>
@@ -202,7 +202,7 @@
                             </div>
                         </div>
                         <br>
-                        <p>Grupo seleccionado</p>
+                        <p>{{ "MENU.SELECTEDGROUPS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let group of this.selectsNoGroups" style="margin: 5px;">
@@ -210,13 +210,13 @@
                             </div>
                         </div>
                     </div><br>
-                    <div class="button"><button type="submit">Edit Subject</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.EDITSUBJECTS" | translate}}</button></div> 
                 </form>
             </div>
 
             <div class="container-career modalAnimation" *ngIf="this.showCreateSubject" style="margin-left: 4%;">
                 <div class="exit"><i class="pi pi-times" (click)="this.showCreateSubject = false"></i></div>
-                <h5>Create Subject</h5>
+                <h5>{{ "MENU.CREATESUBJECT" | translate}}</h5>
                 <br>
                 <form (ngSubmit)="createSubject()" #loginForm="ngForm"> 
                     <div class="form-group input">
@@ -226,17 +226,17 @@
                         <input type="text" id="code" name="code" [(ngModel)]="this.subject.code" required placeholder="Code">
                     </div><br>
                     <div class="form-group input">
-                        <p>Credits</p>
+                        <p>{{ "MENU.CREDITS" | translate}}</p>
                         <input type="number" id="credit" name="credit" [(ngModel)]="this.subject.credit" required placeholder="Credit">
                     </div>
                     <div class="form-group input">
-                        <p>Link</p>
+                        <p>{{ "MENU.LINKS" | translate}}</p>
                         <input type="string" id="link" name="link" [(ngModel)]="this.subject.link" required placeholder="Link">
                     </div>
                     <br>
                     <br>
                     <div class="form-group input">
-                        <p>Period</p>
+                        <p>{{ "MENU.PERIOD" | translate}}</p>
                         <br>
                         <p-slider [(ngModel)]="this.rangeValues" name="quart" [range]="true" styleClass="w-14rem" />
                         <div class="quarts">
@@ -245,7 +245,7 @@
                     </div>
                     <br><br>
                     <div style="border: solid 1px black; padding: 10px; background-color: white;">
-                        <p>Seleccione las materias</p>
+                        <p>{{ "MENU.SELECTSUBJECTS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let subject of this.allSubjects.data" style="margin: 5px;">
@@ -253,7 +253,7 @@
                             </div>
                         </div>
                         <br>
-                        <p>Seleccionados</p>
+                        <p>{{ "MENU.SELECTEDSUBJECTS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let subject of this.subjectsSelected" style="margin: 5px;">
@@ -265,9 +265,9 @@
 
                     <div style="border: solid 1px black; padding: 10px; background-color: white;">
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                            <p>Seleccione Grupo</p>
+                            <p>{{ "MENU.SELECTSUBJECTGROUP" | translate}}</p>
                             <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
-                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">New Group</p>
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">{{ "MENU.NEWGROUP" | translate}}</p>
                             </div>
                         </div>  
                         <br>
@@ -280,7 +280,7 @@
                             </div>
                         </div>
                         <br>
-                        <p>Grupo seleccionado</p>
+                        <p>{{ "MENU.SELECTEDGROUPS" | translate}}</p>
                         <br>
                         <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
                             <div *ngFor="let group of this.groupSelect" style="margin: 5px;">
@@ -289,7 +289,7 @@
                         </div>
                     </div>
                     <br>
-                    <div class="button"><button type="submit">Create Subject</button></div> 
+                    <div class="button"><button type="submit">{{ "MENU.CREATESUBJECT" | translate}}</button></div> 
                 </form>
             </div>
         </div>
@@ -319,11 +319,11 @@
         <div class="message modalAnimation">
             <div class="exit" (click)="this.showNewGroup = false"><i class="pi pi-times"></i></div>
             <br>
-            <h5>New Group</h5>
+            <h5>{{ "MENU.NEWGROUP" | translate}}</h5>
             <br>
             <form (ngSubmit)="this.createGroup()" #loginForm="ngForm"> 
                 <div class="form-group input">
-                    <p>Name</p>
+                    <p>{{ "MENU.NAME" | translate}}</p>
                     <input type="text" id="name" name="nameEdit" [(ngModel)]="this.nameGroup" required placeholder="Name">
                 </div>
                 <br>
@@ -335,9 +335,9 @@
         <div class="message modalAnimation">
             <div class="exit" (click)="this.showDeleteGroup = false"><i class="pi pi-times"></i></div>
             <br>
-            <p>Are you sure you want to delete?</p>
+            <p>{{ "MENU.WANTDELETE" | translate}}</p>
             <br>
-            <div class="button"><button (click)="deleteGroup()">Delete Group</button></div>
+            <div class="button"><button (click)="deleteGroup()">{{ "MENU.DELETEGROUP" | translate}}</button></div>
         </div>
     </div>
 
@@ -345,11 +345,11 @@
         <div class="message modalAnimation" style="width: 60%; height: 60%;">
             <div class="exit" (click)="this.showAllYears = false"><i class="pi pi-times"></i></div>
             <br>
-            <h5>Select Year for clone</h5>
+            <h5>{{ "MENU.SELECTYEARCLONE" | translate}}</h5>
             <br>
             <div style="width: 100%; max-height:80%; background-color: white; display: flex; flex-wrap: wrap; overflow-y: auto; align-items: start;">
                 <div *ngFor="let year of allYears" >
-                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career}}, Year: {{year.year}}</button>
+                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career}}, {{ "MENU.YEAR" | translate}}: {{year.year}}</button>
                 </div>
             </div>
         </div>

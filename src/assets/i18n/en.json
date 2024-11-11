@@ -1,0 +1,48 @@
+{
+    "HOME": {
+        "SELECT": "Select Career"
+    },
+    "LOGIN": {
+        "LOGIN": "Login"
+    },
+    "MENU": {
+        "CAREER": "Career",
+        "EDIT": "Edit",
+        "NAME": "name",
+        "EDITCAREER": "Edit career",
+        "CREATECAREER": "Create career",
+        "CREATE": "Create",
+
+        "YEARS": "Years",
+        "CLONE": "Clone Years",
+        "EDITYEARS": "Edit Years",
+        "YEAR": "Year",
+        "EDITYEAR": "Edit Year",
+        "CREATEYEAR": "Create Year",
+
+        "SUBJECTS": "Subjects",
+        "EDITSUBJECTS": "Edit Subjects",
+        "CREDITS": "Credits",
+        "LINKS": "Links",
+        "PERIOD": "Period",
+        "SELECTSUBJECTS": "Select Subjects",
+        "SELECTEDSUBJECTS": "Selected Subjects",
+        "SELECTSUBJECTGROUP": "Select Subject Group",
+        "NEWGROUP": "New Group",
+        "SELECTEDGROUPS": "Selected Groups",
+        "CREATESUBJECT": "Create Subject",
+        "WANTDELETE": "Are you sure you want to delete?",
+        "DELETEGROUP": "Delete Group",
+        "SELECTYEARCLONE": "Select Year Clone"
+    },
+    "PANEL": {
+        "CREDITS": "Credits",
+        "GROUP": "Group",
+        "NOCRITIC": "No Critical",
+        "CRITIC": "Critical",
+        "VALIDATE": "Validate",
+        "FAIL": "Fail",
+        "PASS": "Pass",
+        "YEAR": "Year"
+    }
+}

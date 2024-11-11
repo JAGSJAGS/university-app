@@ -5,6 +5,7 @@ import { MenuComponent } from './pages/menu/menu.component';
 import { ComponentsModule } from '../components/components.module';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -17,7 +18,8 @@ import { FormsModule } from '@angular/forms';
     MenuRoutingModule,
     ComponentsModule,
     PrimeNgModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ]
 })
 export class MenuModule { }

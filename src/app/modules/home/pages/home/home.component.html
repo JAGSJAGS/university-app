@@ -3,7 +3,7 @@
       <h4></h4><br><br>
       <img src="../../../../../assets/img/logo.png" alt="">
         <form (ngSubmit)="this.goToPanel()" #loginForm="ngForm"> 
-            <p>Select a Career</p>
+            <p>{{ "HOME.SELECT" | translate}}</p>
             <div class="form-group input input-language">
                 <select id="language" name="career" [(ngModel)]="this.career.id" required>
                     <option value="{{career.id}}" *ngFor="let career of this.careers.data" [routerLink]="['/panel']">{{career.name}}</option>
@@ -12,7 +12,9 @@
             <div class="button-select"><button type="submit">Select</button></div>
         </form>
     </div>
-
     <div class="button-login" [routerLink]="['/login']"><button>Login</button></div>
-    <!-- <app-message [messageError]="[{ severity: this.severetyMessage, detail: this.messageError }]" *ngIf="this.showMessageError"></app-message> -->
+    <div class="language">
+        <img (click)="changeLanguage('en')" src="../../../../../assets/img/gran bretaña.jpg" alt="">
+        <img (click)="changeLanguage('ne')" src="../../../../../assets/img/belgica.png" alt="">
+    </div>
 </div>

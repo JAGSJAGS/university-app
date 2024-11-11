@@ -20,6 +20,8 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "@ionic/storage-angular": "^4.0.0",
+    "@ngx-translate/core": "^16.0.3",
+    "@ngx-translate/http-loader": "^16.0.0",
     "jspdf": "^2.5.2",
     "primeicons": "^7.0.0",
     "primeng": "^17.18.4",

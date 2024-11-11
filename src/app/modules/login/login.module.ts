@@ -4,6 +4,7 @@ import { LoginRoutingModule } from './login-routing.module';
 import { LoginComponent } from './pages/login/login.component';
 import { FormsModule } from '@angular/forms';
 import { ComponentsModule } from '../components/components.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 
@@ -15,7 +16,8 @@ import { ComponentsModule } from '../components/components.module';
     CommonModule,
     LoginRoutingModule,
     FormsModule,
-    ComponentsModule
+    ComponentsModule,
+    TranslateModule
   ]
 })
 export class LoginModule { }

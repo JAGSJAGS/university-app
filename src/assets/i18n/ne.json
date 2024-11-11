@@ -1,0 +1,48 @@
+{
+    "HOME": {
+        "SELECT": "Selecteer Carrière"
+    },
+    "LOGIN": {
+        "LOGIN": "Inloggen"
+    },
+    "MENU": {
+        "CAREER": "Carrière",
+        "EDIT": "Bewerken",
+        "NAME": "naam",
+        "EDITCAREER": "Bewerk carrière",
+        "CREATECAREER": "Maak carrière",
+        "CREATE": "Aanmaken",
+
+        "YEARS": "Jaren",
+        "CLONE": "Kloon Jaren",
+        "EDITYEARS": "Bewerk Jaren",
+        "YEAR": "Jaar",
+        "EDITYEAR": "Bewerk Jaar",
+        "CREATEYEAR": "Maak Jaar",
+
+        "SUBJECTS": "Vakken",
+        "EDITSUBJECTS": "Bewerk Vakken",
+        "CREDITS": "Studiepunten",
+        "LINKS": "Links",
+        "PERIOD": "Periode",
+        "SELECTSUBJECTS": "Selecteer Vakken",
+        "SELECTEDSUBJECTS": "Geselecteerde Vakken",
+        "SELECTSUBJECTGROUP": "Selecteer Vakgroep",
+        "NEWGROUP": "Nieuwe Groep",
+        "SELECTEDGROUPS": "Geselecteerde Groepen",
+        "CREATESUBJECT": "Maak Vak",
+        "WANTDELETE": "Weet u zeker dat u wilt verwijderen?",
+        "DELETEGROUP": "Verwijder Groep",
+        "SELECTYEARCLONE": "Selecteer Jaar Kloon"
+    },
+    "PANEL": {
+        "CREDITS": "Credits",
+        "GROUP": "Groep",
+        "NOCRITIC": "Niet Kritiek",
+        "CRITIC": "Kritiek",
+        "VALIDATE": "Vrij",
+        "FAIL": "NG",
+        "PASS": "No NG",
+        "YEAR": "Jaar"
+    }
+}

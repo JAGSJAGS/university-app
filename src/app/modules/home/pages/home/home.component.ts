@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage-angular';
 import { HomeService } from '../../home.service';
 import { Subscription } from 'rxjs';
 import { Career, Careers } from '../../../../interfaces/Career';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,8 @@ export class HomeComponent {
   constructor(
     private router: Router,
     private storage: Storage,
-    private homeService: HomeService
+    private homeService: HomeService,
+    private translate: TranslateService
   )
   {}
 
@@ -57,5 +59,9 @@ export class HomeComponent {
         console.log("error getCategories: " + error);
       }
     }));
+  }
+
+  changeLanguage(language: string){
+    this.translate.use(language);
   }
 }
