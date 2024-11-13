@@ -5,6 +5,7 @@ import { HomeService } from '../../home.service';
 import { Subscription } from 'rxjs';
 import { Career, Careers } from '../../../../interfaces/Career';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../../../../auth.service';
 
 @Component({
   selector: 'app-home',
@@ -27,11 +28,13 @@ export class HomeComponent {
     private router: Router,
     private storage: Storage,
     private homeService: HomeService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   )
   {}
 
   ngOnInit(): void {
+    this.isAuth();
     this.ifAuthenticated(); 
     this.getNamesCareer();
   }
@@ -63,5 +66,15 @@ export class HomeComponent {
 
   changeLanguage(language: string){
     this.translate.use(language);
+  }
+
+  isAuth(){
+    this.subs.add(this.authService.userProfile().subscribe({
+      next: (groups) => {
+        this.router.navigate(['/menu-career']);
+      },
+      error: (error) => {
+      }
+    }));
   }
 }

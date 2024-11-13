@@ -67,7 +67,8 @@ export class MenuComponent {
   year: Year = {
     id:0,
     year:0,
-    subjects:[]
+    subjects:[],
+    career_id: 0
   }
 
 
@@ -86,7 +87,8 @@ export class MenuComponent {
       name: ""
     }],
     groups: [],
-    critic: false
+    critic: false,
+    career_id: 0
   }
 
   groups: any = [];
@@ -505,7 +507,8 @@ selectCreateSubject(){
       name: ""
     }],
     groups: [],
-    critic: false
+    critic: false,
+    career_id: 0
   }
 }
 
@@ -547,7 +550,8 @@ createSubject(){
             name: ""
           }],
           groups: [],
-          critic: false
+          critic: false,
+          career_id: 0
         }
         this.getSubjects();
       },

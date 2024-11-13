@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { Career, Group, Subject, Year } from '../../../../interfaces/Career';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../auth.service';
 import { Subscription } from 'rxjs';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-panel',
@@ -42,9 +42,11 @@ export class PanelComponent{
             name: ""
           }],
           groups: [],
-          critic: false
+          critic: false,
+          career_id: 0,
         }
-      ]
+      ],
+      career_id: 0
     }]
   };
 
@@ -57,7 +59,8 @@ export class PanelComponent{
     private elementRef: ElementRef, 
     private renderer: Renderer2,
     private activatedRoute: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private location: Location
   ) { 
     /* this.unlisten = this.renderer.listen('document', 'DOMContentLoaded', () => {
       this.ifs();
@@ -655,7 +658,8 @@ export class PanelComponent{
     let newYear: Year = {
       id: newYearId,
       year: newYearId,
-      subjects: []
+      subjects: [],
+      career_id: 0
     }
     this.career.years.push(newYear);
   }
@@ -699,5 +703,9 @@ export class PanelComponent{
         console.error('Error al exportar el contenido como PDF:', error);
       });
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

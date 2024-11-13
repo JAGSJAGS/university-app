@@ -1,0 +1,242 @@
+<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
+
+<div class="container">
+    <div class="container-show-career">
+
+        <div class="section-career modalAnimation">
+            <div class="container-career">
+                <div class="menu-top">
+                    <i class="pi pi-arrow-left" (click)="this.goBack()"></i>
+                </div>
+                <br>
+                <p>{{ "MENU.YEAR" | translate}}:{{this.year.year}}</p>
+                <div class="title-career">
+                    <h5>{{ "MENU.SUBJECTS" | translate}}</h5>
+                    <div>
+                        <i class="pi pi-plus-circle" (click)="this.selectCreateSubject()"></i>  
+                    </div> 
+                </div>
+                <br>
+                
+                <div class="career" *ngFor="let subject of this.subjects.data ">
+                    <div style="display: flex; flex-direction: row;">
+                        <i class="pi pi-angle-double-down" (click)="order('down', this.subjects, subject)"></i> 
+                        <i class="pi pi-angle-double-up" style="margin-right: 20px;" (click)="order('up', this.subjects, subject)"></i>
+                        <p>{{subject.name}}</p>
+                    </div>
+                    <div class="icons">
+                        <i class="pi pi-file-edit" (click)="selectEditSubject(subject)"></i> 
+                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="this.selectDeleteSubject(subject)"></i>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+            <div class="container-career modalAnimation" *ngIf="this.showEditSubject" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditSubject = false"></i></div>
+                <h5>{{ "MENU.EDITSUBJECTS" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="editSubject()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="text" id="name" name="name" [(ngModel)]="this.subject.name" required placeholder="Name">
+                    </div><br>
+                    <div class="form-group input">
+                        <input type="text" id="code" name="code" [(ngModel)]="this.subject.code" required placeholder="Code">
+                    </div><br>
+                    <div class="form-group input">
+                        <p>{{ "MENU.CREDITS" | translate}}</p>
+                        <input type="number" id="credit" name="credit" [(ngModel)]="this.subject.credit" required placeholder="Credit">
+                    </div>
+                    <div class="form-group input">
+                        <p>{{ "MENU.LINKS" | translate}}</p>
+                        <input type="text" id="link" name="link" [(ngModel)]="this.subject.link" required placeholder="Link">
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group input">
+                        <p>{{ "MENU.PERIOD" | translate}}</p>
+                        <br>
+                        <p-slider [(ngModel)]="this.rangeValues" name="quart" [range]="true" styleClass="w-14rem" />
+                        <div class="quarts">
+                            <p>1</p><p>2</p><p>3</p><p style="border-right: none;">4</p>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <p>{{ "MENU.SELECTSUBJECTS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let subject of this.allSubjects.data" style="margin: 5px;">
+                                <button (click)="selectSubject(subject.id)" style="padding: 10px; background-color: #464696;">{{subject.name}}</button>
+                            </div>
+                        </div>
+                        <br>
+                        <p>{{ "MENU.SELECTEDSUBJECTS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let subject of this.subjectsSelected" style="margin: 5px;">
+                                <button (click)="discardSelectSubject(subject.id)" style="padding: 10px; background-color: #46966e;">{{subject.name}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <p>{{ "MENU.SELECTSUBJECTGROUP" | translate}}</p>
+                            <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">{{ "MENU.NEWGROUP" | translate}}</p>
+                            </div>
+                        </div>  
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.selectsGroups" style="margin: 5px;" >
+                                <div class="" style="display: flex; flex-direction: row; justify-content: space-between; border: solid 1px #c1c1c1;; background-color: #F3F4F9; padding: 5px; align-items: center;">
+                                    <div (click)="selectsGroupsSubject(subject, group)" style="background-color: #464696;  border-radius: 10px; max-width: 30vw; "><p style="color: white; padding: 10px;">{{group.name}}</p></div>
+                                    <i (click)="this.groupDeleteId = group.id; this.showDeleteGroup = true" class="pi pi-trash" style="color: brown; margin-left: 5px; margin-right: 10px; font-size: 20px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <p>{{ "MENU.SELECTEDGROUPS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.selectsNoGroups" style="margin: 5px;">
+                                <button (click)="selectsGroupsSubject(subject, group)" style="padding: 10px; background-color: #46966e;">{{group.name}}</button>
+                            </div>
+                        </div>
+                    </div><br>
+                    <div class="button"><button type="submit">{{ "MENU.EDITSUBJECTS" | translate}}</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career modalAnimation" *ngIf="this.showCreateSubject" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showCreateSubject = false"></i></div>
+                <h5>{{ "MENU.CREATESUBJECT" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="createSubject()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="text" id="name" name="name" [(ngModel)]="this.subject.name" required placeholder="Name">
+                    </div><br>
+                    <div class="form-group input">
+                        <input type="text" id="code" name="code" [(ngModel)]="this.subject.code" required placeholder="Code">
+                    </div><br>
+                    <div class="form-group input">
+                        <p>{{ "MENU.CREDITS" | translate}}</p>
+                        <input type="number" id="credit" name="credit" [(ngModel)]="this.subject.credit" required placeholder="Credit">
+                    </div>
+                    <div class="form-group input">
+                        <p>{{ "MENU.LINKS" | translate}}</p>
+                        <input type="string" id="link" name="link" [(ngModel)]="this.subject.link" required placeholder="Link">
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group input">
+                        <p>{{ "MENU.PERIOD" | translate}}</p>
+                        <br>
+                        <p-slider [(ngModel)]="this.rangeValues" name="quart" [range]="true" styleClass="w-14rem" />
+                        <div class="quarts">
+                            <p>1</p><p>2</p><p>3</p><p style="border-right: none;">4</p>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <p>{{ "MENU.SELECTSUBJECTS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let subject of this.allSubjects.data" style="margin: 5px;">
+                                <button (click)="selectSubject(subject.id)" style="padding: 10px; background-color: #464696;">{{subject.name}}</button>
+                            </div>
+                        </div>
+                        <br>
+                        <p>{{ "MENU.SELECTEDSUBJECTS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let subject of this.subjectsSelected" style="margin: 5px;">
+                                <button (click)="discardSelectSubject(subject.id)" style="padding: 10px; background-color: #46966e;">{{subject.name}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+
+                    <div style="border: solid 1px black; padding: 10px; background-color: white;">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <p>{{ "MENU.SELECTSUBJECTGROUP" | translate}}</p>
+                            <div (click)="this.showNewGroup = true" style="display: flex; flex-direction: row; align-items: center;">
+                                <i class="pi pi-plus-circle" style="font-size: 30px; color: #464696;"></i><p style="color: #464696;">{{ "MENU.NEWGROUP" | translate}}</p>
+                            </div>
+                        </div>  
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.groups" style="margin: 5px;" >
+                                <div class="" style="display: flex; flex-direction: row; justify-content: space-between; border: solid 1px #c1c1c1;; background-color: #F3F4F9; padding: 5px; align-items: center;">
+                                    <div (click)="selectGroup(group.id, group.name)" style="background-color: #464696;  border-radius: 10px; max-width: 30vw; "><p style="color: white; padding: 10px;">{{group.name}}</p></div>
+                                    <i (click)="this.groupDeleteId = group.id; this.showDeleteGroup = true" class="pi pi-trash" style="color: brown; margin-left: 5px; margin-right: 10px; font-size: 20px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <p>{{ "MENU.SELECTEDGROUPS" | translate}}</p>
+                        <br>
+                        <div class="form-group input" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                            <div *ngFor="let group of this.groupSelect" style="margin: 5px;">
+                                <button (click)="deselectGroup(group.id)" style="padding: 10px; background-color: #46966e;">{{group.name}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">{{ "MENU.CREATESUBJECT" | translate}}</button></div> 
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showNewGroup">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showNewGroup = false"><i class="pi pi-times"></i></div>
+            <br>
+            <h5>{{ "MENU.NEWGROUP" | translate}}</h5>
+            <br>
+            <form (ngSubmit)="this.createGroup()" #loginForm="ngForm"> 
+                <div class="form-group input">
+                    <p>{{ "MENU.NAME" | translate}}</p>
+                    <input type="text" id="name" name="nameEdit" [(ngModel)]="this.nameGroup" required placeholder="Name">
+                </div>
+                <br>
+                <div class="button"><button type="submit" style="background-color: #46966e;">Create Group</button></div> 
+            </form>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showDeleteSubject" (click)="this.showDeleteSubject = false">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showDeleteSubject = false"><i class="pi pi-times"></i></div>
+            <br>
+            <p>Are you sure you want to delete?</p>
+            <br>
+            <div class="button"><button (click)="deleteSubject()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="spinner" *ngIf="showSpinner">
+        <p-progressSpinner styleClass="w-2vh h-2vh" strokeWidth="2" fill="var(--surface-ground)" animationDuration="2s" />
+    </div>
+
+    
+
+    <div style="position: fixed;">
+        <p-messages *ngIf="this.showMessage" (click)="this.showMessage = false"
+        [(value)]="messages" 
+        [enableService]="false" 
+        [closable]="false" />
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showDeleteGroup" (click)="this.showDeleteGroup = false">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showDeleteGroup = false"><i class="pi pi-times"></i></div>
+            <br>
+            <p>{{ "MENU.WANTDELETE" | translate}}</p>
+            <br>
+            <div class="button"><button (click)="deleteGroup()">{{ "MENU.DELETEGROUP" | translate}}</button></div>
+        </div>
+    </div>
+</div>

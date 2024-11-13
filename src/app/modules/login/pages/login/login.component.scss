@@ -5,6 +5,10 @@
     justify-content: center;
     align-items: center;
     background-color: #F9FAFB;
+    background-image: url('../../../../../assets/img/background.jpg'); /* Ruta de la imagen */
+    background-size: cover; /* Ajusta la imagen para que cubra todo el div */
+    background-position: center; /* Centra la imagen en el div */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
 }
 .container-login{
     width: 32%;

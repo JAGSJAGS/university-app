@@ -3,7 +3,7 @@
   min-height: 100vh;
   padding-top: 10vh;
   align-items: center;
-  padding-bottom: 10vh;
+  padding-bottom: 2vh;
 }
 .container-table{
   min-width: 90%;
@@ -94,6 +94,11 @@
   border-radius: 5px;
   color: #ffffff;
   position: relative;
+  p{
+    white-space: nowrap; /* Evita que el texto haga un salto de línea */
+    overflow: hidden; /* Oculta el texto que sobrepasa el ancho */
+    text-overflow: ellipsis; /* Agrega los puntos suspensivos */
+  }
 }
 .subject-information{
   width: 100%;

@@ -9,6 +9,7 @@ import { MessagesModule } from 'primeng/messages';
 import { DropdownModule } from 'primeng/dropdown';
 import { SliderModule } from 'primeng/slider';
 import { ListboxModule } from 'primeng/listbox';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { ListboxModule } from 'primeng/listbox';
     MessagesModule,
     DropdownModule,
     SliderModule,
-    ListboxModule
+    ListboxModule,
+    ProgressSpinnerModule
   ]
 })
 export class PrimeNgModule { }

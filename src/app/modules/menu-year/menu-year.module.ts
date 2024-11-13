@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MenuCareerRoutingModule } from './menu-career-routing.module';
-import { MenuCareerComponent } from './pages/menu-career/menu-career.component';
+import { MenuYearComponent } from './pages/menu-year/menu-year.component';
+import { MenuYearRoutingModule } from './menu-year-routing.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
@@ -10,14 +10,14 @@ import { PrimeNgModule } from '../prime-ng/prime-ng.module';
 
 @NgModule({
   declarations: [
-    MenuCareerComponent
+    MenuYearComponent
   ],
   imports: [
     CommonModule,
-    MenuCareerRoutingModule,
+    MenuYearRoutingModule,
     TranslateModule,
     FormsModule,
     PrimeNgModule
   ]
 })
-export class MenuCareerModule { }
+export class MenuYearModule { }

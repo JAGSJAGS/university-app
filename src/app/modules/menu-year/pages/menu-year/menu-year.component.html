@@ -1,0 +1,95 @@
+<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
+
+<div class="container">
+    <div class="container-show-career">
+        <div class="section-career modalAnimation">
+            <div class="container-career">
+                <div class="menu-top">
+                    <i class="pi pi-arrow-left" (click)="this.goBack()"></i>
+                </div>
+                <br>
+                <p>{{this.career.name}}</p>
+                <div class="title-career">
+                    
+                    <h5>{{ "MENU.YEARS" | translate}}</h5>
+                    <div style="display: flex;  flex-direction: row;">
+                        <button style="margin-right: 5px;" (click)="this.showAllYears = true; this.getAllYears();">{{ "MENU.CLONE" | translate}}</button>
+                        <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
+                    </div>
+                </div>
+                <br>
+                <div class="career" *ngFor="let year of this.years.data ">
+                    <button (click)="selectSubjects(year)">{{year.year}}</button>
+                    <div class="icons">
+                        <i class="pi pi-file-edit" (click)="this.selectUpdateYear(year)"></i> 
+                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="this.selectDeleteYear(year)"></i>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+            <div class="container-career modalAnimation" *ngIf="this.showEditYear" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditYear = false"></i></div>
+                <h5>{{ "MENU.EDITYEARS" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="updateYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <p>{{ "MENU.YEAR" | translate}}</p>
+                        <input type="number" id="yearEdit" name="yearEdit" [(ngModel)]="this.year.year" required placeholder="New Year">
+                        
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">{{ "MENU.EDITYEAR" | translate}}</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career modalAnimation" *ngIf="this.showCreateYear" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showCreateYear = false"></i></div>
+                <h5>{{ "MENU.EDITYEAR" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="createYear()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="New Year">
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">{{ "MENU.CREATEYEAR" | translate}}</button></div> 
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showAllYears">
+        <div class="message modalAnimation" style="width: 60%; height: 60%;">
+            <div class="exit" (click)="this.showAllYears = false"><i class="pi pi-times"></i></div>
+            <br>
+            <h5>{{ "MENU.SELECTYEARCLONE" | translate}}</h5>
+            <br>
+            <div style="width: 100%; max-height:80%; background-color: white; display: flex; flex-wrap: wrap; overflow-y: auto; align-items: start;">
+                <div *ngFor="let year of allYears" >
+                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career}}, {{ "MENU.YEAR" | translate}}: {{year.year}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showDeleteYear" (click)="this.showDeleteYear = false">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showDeleteYear = false"><i class="pi pi-times"></i></div>
+            <br>
+            <p>Are you sure you want to delete?</p>
+            <br>
+            <div class="button"><button (click)="deleteYear()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="spinner" *ngIf="showSpinner">
+        <p-progressSpinner styleClass="w-2vh h-2vh" strokeWidth="2" fill="var(--surface-ground)" animationDuration="2s" />
+    </div>
+
+    <div style="position: fixed;">
+        <p-messages *ngIf="this.showMessage" (click)="this.showMessage = false"
+        [(value)]="messages" 
+        [enableService]="false" 
+        [closable]="false" />
+    </div>
+</div>

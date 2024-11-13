@@ -1,1 +1,75 @@
-<p>menu-career works!</p>
+<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
+
+<div class="container">
+    <div class="container-show-career">
+        
+        <div class="section-career modalAnimation">
+            <div class="container-career">
+                <div class="title-career">
+                    <h5>{{ "MENU.CAREER" | translate}}</h5>
+                    <i class="pi pi-plus-circle" (click)="this.selectCreateCareer()"></i>  
+                </div>
+                <br>
+                <div class="career" *ngFor="let career of this.careers.data">
+                    <button (click)="selectYears(career)" >{{career.name}}</button>
+                    <div class="icons">
+                        <i class="pi pi-file-edit" (click)="this.selectEditCareer(career)"></i> 
+                        <i class="pi pi-eye" style="color: green;" [routerLink]="['/panel', career.id]"></i>
+                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="this.selectDeleteCareer(career)"></i>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+            <div class="container-career modalAnimation" *ngIf="this.showEditCareer" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showEditCareer = false"></i></div>
+                <h5>{{ "MENU.CAREER" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="updateCareer()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <p>{{ "MENU.NAME" | translate}}</p>
+                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">{{ "MENU.EDITCAREER" | translate}}</button></div> 
+                </form>
+            </div>
+
+            <div class="container-career modalAnimation" *ngIf="this.showCreateCareer" style="margin-left: 4%;">
+                <div class="exit"><i class="pi pi-times" (click)="this.showCreateCareer = false"></i></div>
+                <h5>{{ "MENU.CREATECAREER" | translate}}</h5>
+                <br>
+                <form (ngSubmit)="createCareer()" #loginForm="ngForm"> 
+                    <div class="form-group input">
+                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
+                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
+                    </div>
+                    <br>
+                    <div class="button"><button type="submit">{{ "MENU.CREATE" | translate}}</button></div> 
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-mesaage" *ngIf="this.showDeleteCareer" (click)="this.showDeleteCareer = false">
+        <div class="message modalAnimation">
+            <div class="exit" (click)="this.showDeleteCareer = false"><i class="pi pi-times"></i></div>
+            <br>
+            <p>Are you sure you want to delete?</p>
+            <br>
+            <div class="button"><button (click)="deleteCareer()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="spinner" *ngIf="showSpinner">
+        <p-progressSpinner styleClass="w-2vh h-2vh" strokeWidth="2" fill="var(--surface-ground)" animationDuration="2s" />
+    </div>
+
+    <div style="position: fixed;">
+        <p-messages *ngIf="this.showMessage" (click)="this.showMessage = false"
+        [(value)]="messages" 
+        [enableService]="false" 
+        [closable]="false" />
+    </div>
+</div>

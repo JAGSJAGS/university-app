@@ -15,9 +15,25 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./modules/login/login.module').then( m => m.LoginModule)
   },
-  {
+  /* {
     path: 'menu',
     loadChildren: () => import('./modules/menu/menu.module').then( m => m.MenuModule),
+    canActivate: [AuthGuard]
+  }, */
+  {
+    path: 'menu-career',
+    loadChildren: () => import('./modules/menu-career/menu-career.module').then( m => m.MenuCareerModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'menu-year/:id',
+    loadChildren: () => import('./modules/menu-year/menu-year.module').then( m => m.MenuYearModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'menu-subject/:id',
+    loadChildren: () => import('./modules/menu-subject/menu-subject.module').then( m => m.MenuSubjectModule),
+    canActivate: [AuthGuard]
   },
   {
     path: '',

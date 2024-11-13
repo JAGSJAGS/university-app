@@ -21,7 +21,7 @@ export class AppComponent {
     private translate: TranslateService
   ){
     this.ngOnInit();
-    this.isAuth();
+    //this.isAuth();
     this.getLanguage();
   }
 
@@ -32,7 +32,7 @@ export class AppComponent {
   isAuth(){
     this.subs.add(this.authService.userProfile().subscribe({
       next: (groups) => {
-        this.router.navigate(['/menu']);
+        //this.router.navigate(['/menu']);
       },
       error: (error) => {
       }

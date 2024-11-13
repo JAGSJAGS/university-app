@@ -10,7 +10,8 @@ export interface Subject {
     link: string,
     group: Group[],
     groups: number [],
-    critic: boolean
+    critic: boolean,
+    career_id: number
 }
 
 export interface Group {
@@ -22,6 +23,7 @@ export interface Year {
     id: number;
     year: number;
     subjects: Subject[];
+    career_id: number
 }
 
 export interface Career {

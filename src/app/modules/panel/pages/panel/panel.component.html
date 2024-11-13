@@ -1,7 +1,8 @@
 <div class="container">
   <div class="menu-container" (mouseover)="this.showSubjectInformation = ''" style="background-color: #F5F5F7; margin-left: 5%;">
-    <i class="pi pi-arrow-left" style="font-size: 2rem" [routerLink]="['/home']"></i>  
+    <i class="pi pi-arrow-left" style="font-size: 2rem" (click)="this.goBack()"></i>  
     <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>
+    <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
     <i class="pi pi-arrow-down" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
     <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
   </div><br>
@@ -42,7 +43,7 @@
                   <div class="subject-information" *ngIf="showSubjectInformation === subject.id">
                     <p>{{subject.name}}</p>
                     <p>{{ "PANEL.CREDITS" | translate}}: {{subject.credit}}</p>
-                    <a href="{{subject.link}}" target="_blank" rel="noopener noreferrer">{{subject.link}}</a>
+                    <a href="{{subject.link}}" target="_blank" rel="noopener noreferrer">Link</a>
                     <p *ngIf="subject.group.length >0" style="background-color: #f6ff00;" >{{ "PANEL.GROUP" | translate}}: {{subject.group[0].name}}</p>
                     <div class="container-button-subject">
         
@@ -91,7 +92,15 @@
         </div>
     </div>
   </div>
+  <br>
+  <br>
+  <br>
   
+</div>
+<div class="panel" style="display: flex; justify-content: space-between; width: 80%; margin-left: 10%; border-top: 1px solid #a5a5a5; padding-top: 10px;" >
+  <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
+  <p style="font-size: 14px; color: #a5a5a5;">Technologyca AB</p>
+  <p style="font-size: 14px; color: #a5a5a5;">Dev. by Amado Gimenez</p>
 </div>
 </div>
   

@@ -20,12 +20,17 @@ export class LoginComponent {
 
   showSpinner: boolean = true;
   showMessageError: boolean = false;
+  showLogin: boolean = true;
 
   constructor(
     private authService: AuthService,
     private storage: Storage,
     private router: Router
   ){}
+
+  ngOnInit(): void {
+    this.isAuth();
+  }
 
   login(){
     if(this.validate()){
@@ -36,7 +41,7 @@ export class LoginComponent {
           this.storage.set('access_token', valor.access_token);
           this.storage.set('authenticated', true);
           //console.log('autenticado', valor);
-          this.router.navigate(['/menu']);
+          this.router.navigate(['/menu-career']);
           this.showSpinner = false;
         },
         error: (error) => {
@@ -80,5 +85,15 @@ export class LoginComponent {
       res = false;
     }
     return res;
+  }
+
+  isAuth(){
+    this.subs.add(this.authService.userProfile().subscribe({
+      next: (groups) => {
+        this.router.navigate(['/menu-career']);
+      },
+      error: (error) => {
+      }
+    }));
   }
 }

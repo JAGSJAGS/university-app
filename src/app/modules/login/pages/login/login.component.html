@@ -1,7 +1,7 @@
 <div class="container">
     <div class="container-login"><br>
       <img src="../../../../../assets/img/logo.png" alt="">
-      <h4>{{ "LOGIN.LOGIN" | translate}}</h4><br>
+      <h5>{{ "LOGIN.LOGIN" | translate}}</h5><br>
       <form (ngSubmit)="login()" #loginForm="ngForm"> 
           <div class="form-group input">
             <input type="email" id="email" name="email" [(ngModel)]="this.email" required placeholder="Email">
