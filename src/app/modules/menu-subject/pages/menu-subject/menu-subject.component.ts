@@ -44,7 +44,8 @@ export class MenuSubjectComponent {
     id:0,
     year:0,
     subjects:[],
-    career_id: 0
+    career_id: 0,
+    career_name: ""
   }
 
   career: Career = {

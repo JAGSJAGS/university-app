@@ -23,7 +23,8 @@ export interface Year {
     id: number;
     year: number;
     subjects: Subject[];
-    career_id: number
+    career_id: number,
+    career_name: string
 }
 
 export interface Career {

@@ -66,7 +66,7 @@
             <br>
             <div style="width: 100%; max-height:80%; background-color: white; display: flex; flex-wrap: wrap; overflow-y: auto; align-items: start;">
                 <div *ngFor="let year of allYears" >
-                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career}}, {{ "MENU.YEAR" | translate}}: {{year.year}}</button>
+                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career_name}}, {{ "MENU.YEAR" | translate}}: {{year.year}}</button>
                 </div>
             </div>
         </div>

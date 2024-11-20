@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage-angular';
 import { MenuService } from '../../menu.service';
 import { Career, Year, Subject, Careers, Years, Subjects, Group } from '../../../../interfaces/Career';
-import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-menu',
@@ -68,7 +67,8 @@ export class MenuComponent {
     id:0,
     year:0,
     subjects:[],
-    career_id: 0
+    career_id: 0,
+    career_name: ""
   }
 
 

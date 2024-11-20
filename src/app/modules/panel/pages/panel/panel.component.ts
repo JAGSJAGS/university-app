@@ -46,7 +46,8 @@ export class PanelComponent{
           career_id: 0,
         }
       ],
-      career_id: 0
+      career_id: 0,
+      career_name: ""
     }]
   };
 
@@ -659,7 +660,8 @@ export class PanelComponent{
       id: newYearId,
       year: newYearId,
       subjects: [],
-      career_id: 0
+      career_id: 0,
+      career_name: ""
     }
     this.career.years.push(newYear);
   }
