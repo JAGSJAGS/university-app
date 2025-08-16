@@ -150,6 +150,14 @@ export class PanelComponent{
           let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
           subjectRender.style.backgroundColor = '#850000';
         }
+        if(subject.id > 1000){
+          let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
+          subjectRender.style.backgroundColor = '#b15e5192';
+          if(subject.validate){
+            let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
+            subjectRender.style.backgroundColor = '#687d7f';
+          }
+        }
       })
     });
   }
@@ -377,8 +385,8 @@ export class PanelComponent{
   paintBorderSubject(subjectId: number){
     let subject = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjectId);
     //let subject2 = this.elementRef.nativeElement.querySelector('#' + 'big' + subjectId);
-    this.renderer.setStyle(subject, 'border', 'solid 2px rgb(255, 255, 255)');
-    this.renderer.setStyle(subject, 'box-shadow', ' 0 0 0 2px rgb(0, 0, 0)');
+    this.renderer.setStyle(subject, 'border', 'solid 4px rgb(110, 255, 216)');
+    this.renderer.setStyle(subject, 'box-shadow', ' 0 0 0 1px rgb(0, 0, 0)');
     //this.renderer.setStyle(subject2, 'border', 'solid 2px #ffff00');
   }
 
@@ -575,10 +583,10 @@ export class PanelComponent{
     subject.fail = !subject.fail;
   }
 
-  paintSubjecFail(subjectCode: number, fail: boolean){
+  /* paintSubjecFail(subjectCode: number, fail: boolean){
     let subjectRend = this.elementRef.nativeElement.querySelector('#sub' + subjectCode);
     let subjectRend1 = this.elementRef.nativeElement.querySelector('#big' + subjectCode);
-  }
+  } */
 
   requirementSubject(subjectCode: number, fail: boolean){
 
