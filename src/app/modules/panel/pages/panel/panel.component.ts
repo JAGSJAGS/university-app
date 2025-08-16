@@ -306,6 +306,9 @@ export class PanelComponent{
     if(quarts[0] === 3){
       marginLeft = '51%'
     }
+    if(quarts[0] === 4){
+      marginLeft = '76%'
+    }
 
     if(sizeQuart === 3){
       width = "99%"
@@ -374,7 +377,8 @@ export class PanelComponent{
   paintBorderSubject(subjectId: number){
     let subject = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjectId);
     //let subject2 = this.elementRef.nativeElement.querySelector('#' + 'big' + subjectId);
-    this.renderer.setStyle(subject, 'border', 'solid 2px #ffff00');
+    this.renderer.setStyle(subject, 'border', 'solid 2px rgb(255, 255, 255)');
+    this.renderer.setStyle(subject, 'box-shadow', ' 0 0 0 2px rgb(0, 0, 0)');
     //this.renderer.setStyle(subject2, 'border', 'solid 2px #ffff00');
   }
 
@@ -394,6 +398,7 @@ export class PanelComponent{
     let subject = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjectCode);
     //let subject2 = this.elementRef.nativeElement.querySelector('#' + 'big' + subjectCode);
     this.renderer.setStyle(subject, 'border', 'none');
+    this.renderer.setStyle(subject, 'box-shadow', 'none');
     //this.renderer.setStyle(subject2, 'border', 'none');
   }
 

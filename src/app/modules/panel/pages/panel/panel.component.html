@@ -3,7 +3,7 @@
     <i class="pi pi-arrow-left" style="font-size: 2rem" (click)="this.goBack()"></i>  
     <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>
     <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
-    <i class="pi pi-arrow-down" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
+    <i class="pi pi-file-export" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
     <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
   </div><br>
   <div id="htmlContent" class="container-table">
@@ -36,8 +36,8 @@
                   <div class="subject" [id]="'sub' + subject.id" [style]="changeStyle(subject.quarts)">
                     <!-- {{this.paintFailSubject(subject.id, subject.fail, 'small', subject.validate)}} -->
                     <p>{{subject.name}}</p>
-                    <div class="arrow arrowLeft" (click)="moveSubjectYear(subject, year, 'left')" *ngIf=" !subject.critic && !subject.fail"><i class="pi pi-angle-left"></i></div>
-                    <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf="!subject.critic && !subject.fail"><i class="pi pi-angle-right"></i></div> 
+                    <div class="arrow arrowLeft" (click)="moveSubjectYear(subject, year, 'left')" *ngIf=" !subject.critic && !subject.fail && subject.id<1000"><i class="pi pi-angle-left"></i></div>
+                    <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf="!subject.critic && !subject.fail && subject.id<1000"><i class="pi pi-angle-right"></i></div> 
                   </div>
   
                   <div class="subject-information" *ngIf="showSubjectInformation === subject.id">
