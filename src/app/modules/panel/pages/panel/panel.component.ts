@@ -125,10 +125,21 @@ export class PanelComponent{
   }
 
   iff(){
+    this.showGroups = [];
+    this.messageGroups = "";
+    this.career.years.forEach( year => {
+        year.subjects.forEach(subjec => {
+         let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjec.id);
+         this.renderer.setStyle(subjectRender, 'border', 'none');
+         this.renderer.setStyle(subjectRender, 'box-shadow', 'none');
+        });
+    });
+
     this.career.years.forEach(year => {
       year.subjects.forEach(subject => {
         let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
         subjectRender.style.backgroundColor = '#007e67';
+        
 
         
         if(subject.validate){
@@ -136,10 +147,11 @@ export class PanelComponent{
           subjectRender.style.backgroundColor = '#687d7f';
         }
         else{
-          if(this.ifIsSameGroup(year.id, subject)){
+          this.ifIsSameGroup(year.id, subject);
+          /* if(this.ifIsSameGroup(year.id, subject)){
             let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
             subjectRender.style.backgroundColor = '#b15e5192';
-          }
+          } */
         }
         if(subject.critic){
           let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
@@ -158,15 +170,59 @@ export class PanelComponent{
             subjectRender.style.backgroundColor = '#687d7f';
           }
         }
+        this.ifIsRequerid(subject, year.year);
       })
     });
+    this.showGroups = [... new Set(this.showGroups)];
+    if( this.showGroups.length > 0){
+      this.messageGroups = "Los grupos" + " " + this.showGroups + " " + "tienen que estar unidos";
+      console.log(this.messageGroups);
+    }
   }
 
-  ifIsSameGroup(yearId: number, subject: Subject): boolean {
-    // Retorna true si subject.validate es falso
+  ifIsRequerid(subject: Subject, yearNumber: number){
+
+    this.career.years.forEach( year => {
+        year.subjects.forEach(subjec => {
+          /* if(subject.id !== subjec.id){
+            
+          }  */
+         let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
+         let subjectRender2 = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjec.id);
+          subject.requirements.forEach(requirement => {
+            if(requirement === subjec.id && year.year >= yearNumber && !subject.validate && !subjec.validate){
+              
+              this.renderer.setStyle(subjectRender, 'border', 'solid 5px #ff0077ff');
+              this.renderer.setStyle(subjectRender2, 'border', 'solid 5px #ff0077ff');
+              this.renderer.setStyle(subjectRender, 'background-color', 'solid 5px #ff0077ff');
+              this.renderer.setStyle(subjectRender2, 'background-color', 'solid 5px #ff0077ff');
+              this.renderer.setStyle(subjectRender, 'box-shadow', ' 0 0 0 1px rgb(0, 0, 0)');
+              this.renderer.setStyle(subjectRender2, 'box-shadow', ' 0 0 0 1px rgb(0, 0, 0)');
+            }
+          }); 
+        });
+      }); 
+  }
+
+  showGroups: String[] = [];
+  messageGroups: string = "";
+  ifIsSameGroup(yearId: number, subject: Subject){
     
-    // Retorna true si encuentra un grupo coincidente y `otherSubject.validate` es falso
-    return this.career.years.some(year => 
+    this.career.years.forEach( year => {
+      if(year.id !== yearId){
+        year.subjects.forEach(subjec => {
+          let subjectRender = this.elementRef.nativeElement.querySelector('#' + 'sub' + subject.id);
+          let subjectRender2 = this.elementRef.nativeElement.querySelector('#' + 'sub' + subjec.id);
+          subject.group.forEach(group => {
+            if( group.id === subjec.group[0]?.id ){
+                this.showGroups.push(subject.name);
+              }
+            }); 
+        });
+      }
+    });
+
+    /* this.career.years.some(year => 
       year.id !== yearId && 
       year.subjects.some(otherSubject => 
         ((!otherSubject.validate &&
@@ -174,8 +230,7 @@ export class PanelComponent{
           otherSubject.group.some(group => group.id === subject.group[0]?.id)
         ))
       )
-    );
-    
+    ); */
   }
 
   validate(subject: Subject){
@@ -184,7 +239,7 @@ export class PanelComponent{
     this.table();
   }
 
-  paintValidateGroup(subject: Subject) {
+  /* paintValidateGroup(subject: Subject) {
     this.career.years.forEach(yea => {
       yea.subjects.forEach(otherSubject => {
         if(otherSubject.group.some(group => group.id === subject.group[0].id)){
@@ -206,7 +261,7 @@ export class PanelComponent{
         }
       })
     });
-  }
+  } */
 
   unpaintValidateGroup(subject: Subject){
     this.career.years.forEach(yea => {
@@ -395,7 +450,7 @@ export class PanelComponent{
       this.career.years.forEach(yea => {
           yea.subjects.forEach(subject => {
             if(subject.group.some(group => group.id === groupf[0].id)){
-              this.unPaintBorderSubject(subject.id)
+              this.iff();
             }
           })
       });

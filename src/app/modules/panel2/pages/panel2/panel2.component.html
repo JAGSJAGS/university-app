@@ -1,0 +1,98 @@
+<div class="container">
+    <div class="menu-container" (mouseover)="this.showSubjectInformation = ''" style="background-color: #F5F5F7; margin-left: 5%;">
+        <i class="pi pi-arrow-left" style="font-size: 2rem" (click)="this.goBack()"></i>  
+        <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>
+        <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
+        <i class="pi pi-file-pdf" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
+        <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
+    </div><br>
+    <div id="htmlContent" class="container-table">
+        <h5 style="width: 100%; text-align: center;">{{this.career.name}}</h5>
+        <br>
+        <div class="table">
+            <div class="p-table" *ngFor="let year of career.years">
+                <div class="title-year"> 
+                {{year.year + " "}} {{ "PANEL.YEAR" | translate}}
+                <i class="pi pi-times" (click)="deleteYearById(year.id)"></i>
+                </div>
+                <p-table [value]="year.subjects">
+                    <ng-template pTemplate="header">
+                    <tr>
+                        <th class="quarts">
+                        <div style="border-left: none;" class="quart">1</div>
+                        <div class="quart">2</div>
+                        <div class="quart">3</div>
+                        <div class="quart">4</div>
+                        </th>
+                    </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-subject>
+                        <tr>
+                            <td style="padding: 2% 1%;"
+                            (mouseover)="this.showSubjectInformation = subject.id; paintGroup(subject)"
+                                        (mouseout)="this.numberGroup = 0">
+                                <div class="subject-container"
+                                        >
+                                    <div
+                                        class="subject sub{{subject.id}}" 
+                                        [id]="'sub' + subject.id" 
+                                        [attr.data-subid]="subject.code"
+                                        [style]="subjectStyle(subject, year)"
+                                        style="font-size: 16px;">
+                                        {{subject.name}}
+                                        <div class="arrow arrowLeft"  (click)="moveSubjectYear(subject, year, 'left')"  *ngIf=" !subject.critic && !subject.fail"><i class="pi pi-angle-left"></i></div>
+                                        <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf=" !subject.critic && !subject.fail" ><i class="pi pi-angle-right"></i></div> 
+                                    </div>
+                                </div>
+                                <div class="subject-information" *ngIf="showSubjectInformation === subject.id">
+                                    <p>{{subject.name}}</p>
+                                    <p>{{ "PANEL.CREDITS" | translate}}: {{subject.credit}}</p>
+                                    <a href="{{subject.link}}" target="_blank" rel="noopener noreferrer">Link</a>
+                                    <p *ngIf="subject.group.length >0" style="background-color: #a6ff00ff;" >{{ "PANEL.GROUP" | translate}}: {{subject.group[0].name}}</p>
+                                    <div class="container-button-subject">
+                                        <button class="button-validate" (click)="validate(subject)" *ngIf="!subject.fail" >{{ "PANEL.VALIDATE" | translate}}</button>
+                                        <button class="button-validate" (click)="critic(subject, year)" *ngIf="!subject.critic && year.year === 1 && !subject.fail" style="background-color: #d7531b;">{{ "PANEL.CRITIC" | translate}}</button>
+                                        <button class="button-validate" (click)="noCritic(subject, year)" *ngIf="subject.critic" style="background-color: #d7531b;">{{ "PANEL.NOCRITIC" | translate}}</button>
+                                        <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.critic && !subject.fail">{{ "PANEL.FAIL" | translate}}</button>
+                                        <button class="button-fail" (click)="fail(subject, year)" *ngIf="subject.fail">{{ "PANEL.PASS" | translate}}</button>
+                                    </div>  
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div class="quarts-botom">
+                    <div style="border-left: none;" class="quart">{{ allHoursQuarts(year.subjects, 0)}}</div>
+                    <div class="quart">{{ allHoursQuarts(year.subjects, 1)}}</div>
+                    <div class="quart">{{ allHoursQuarts(year.subjects, 2)}}</div>
+                    <div class="quart">{{ allHoursQuarts(year.subjects, 3)}}</div>   
+                </div>
+                <div class="quarts-botom2" 
+                    *ngIf=" this.suma(year) <= 60 ; else quartsbottom" >
+                    {{suma(year)}}
+                </div>
+                <ng-template #quartsbottom>
+                    <div style="color: brown;" 
+                        class="quarts-botom2">
+                            {{this.suma(year)}}
+                        <div style="font-size: 12px">
+                            (max 72)
+                        </div>
+                    </div>
+                </ng-template>
+                
+            </div>
+            
+            
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+
+    <div class="panel" style="display: flex; justify-content: space-between; width: 80%; margin-left: 10%; border-top: 1px solid #a5a5a5; padding-top: 10px;" >
+  <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
+  <p style="font-size: 14px; color: #a5a5a5;">Technologyca AB</p>
+  <p style="font-size: 14px; color: #a5a5a5;">Dev. by Amado Gimenez</p>
+</div>
+</div>
