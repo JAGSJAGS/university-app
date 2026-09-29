@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment.prod';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { from, map, Observable, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { User } from './interfaces/user';
 import { Storage } from '@ionic/storage-angular';
 import { Career } from './interfaces/Career';
@@ -26,12 +26,7 @@ export class AuthService {
 
   logOutUser(){
     const url = `${this.apiUrl}/logout_user`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({'Authorization': `Bearer ${token}`});
-        return this.http.get<any>(url, { headers });
-      })
-    )
+    return this.http.get<any>(url);
   }
 
   getJsonFile(nameFile: string):Observable<Career>{
@@ -41,51 +36,17 @@ export class AuthService {
 
   getCareer(id: number): Observable<any> {
     let url = `${this.apiUrl}/get_all_career`;
-  
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        let options = {
-          headers,
-          params: {
-            'id': id
-          }
-        };
-        return this.http.get<any>(url, options);
-      })
-    );
+    return this.http.get<any>(url, { params: { 'id': id } });
   }
 
   deleteGroup(id: number){
     let url = `${this.apiUrl}/delete_group`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders({'Authorization': `Bearer ${token}`});
-        let options = {
-          headers: headers,
-          params: { 'id': id }
-        };
-        return this.http.delete<any>(url, options);
-      })
-    );
+    return this.http.delete<any>(url, { params: { 'id': id } });
   }
 
   userProfile(): Observable<any> {
     let url = `${this.apiUrl}/user_profile`;
-  
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        let options = {
-          headers,
-        };
-        return this.http.get<any>(url, options);
-      })
-    );
+    return this.http.get<any>(url);
   }
 
   /* registerUser2( user: User):Observable<any>{
@@ -121,38 +82,17 @@ export class AuthService {
 
   getUserProfile(): Observable<any> {
     const url = `${this.apiUrl}/user_profile`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        return this.http.get<any>(url, { headers });
-      })
-    );
+    return this.http.get<any>(url);
   }
 
   getAllGroups(): Observable<any> {
     let url = `${ this.apiUrl }/get_all_groups`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        return this.http.get<any>(url, { headers });
-      })
-    );
+    return this.http.get<any>(url);
   }
 
   createGroup(name: string): Observable<any> {
     let url = `${ this.apiUrl }/create_group`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        return this.http.post<any>(url, {'name': name}, { headers });
-      })
-    );
+    return this.http.post<any>(url, {'name': name});
   }
 
   /* logOutUser(){
@@ -195,9 +135,7 @@ export class AuthService {
     )
   } */
 
-  private getToken(): Promise<string | null> {
-    return this.storage.get('access_token');
-  }
+  // (el token lo añade AuthInterceptor)
 
   private getCityStorage(): Promise<string | null> {
     return this.storage.get('country');

@@ -1,9 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Career, Careers } from '../../interfaces/Career';
-import { from, Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.prod';
-import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +12,7 @@ export class MenuCareerService {
   private apiUrl: string = environment.apiUrl;
 
   constructor(
-    private http: HttpClient,
-    private storage: Storage
+    private http: HttpClient
   ) { }
 
   getCareers():Observable<Careers>{
@@ -24,58 +22,18 @@ export class MenuCareerService {
 
   createCareer( career: Career):Observable<any>{
     let url = `${ this.apiUrl }/create_career`;
-
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        return this.http.post<any>(url, 
-        { 
-          "name": career.name
-        },
-        {
-          headers
-        });
-      })
-    );
+    return this.http.post<any>(url, { "name": career.name });
   }
 
   updateCareer( career: Career):Observable<any>{
     let url = `${ this.apiUrl }/update_career`;
-
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        });
-        return this.http.post<any>(url, 
-        { 
-          "id": career.id,
-          "name": career.name
-        },
-        {
-          headers
-        });
-      })
-    );
+    return this.http.post<any>(url, { "id": career.id, "name": career.name });
   }
 
   deleteCareer(career: Career){
     const url = `${this.apiUrl}/delete_career`;
-    return from(this.getToken()).pipe(
-      switchMap(token => {
-        const headers = new HttpHeaders({'Authorization': `Bearer ${token}`});
-        const options = {
-          headers: headers,
-          params: { 'id': career.id }
-        };
-        return this.http.delete<any>(url, options);
-      })
-    );
+    return this.http.delete<any>(url, { params: { 'id': career.id } });
   }
 
-  private getToken(): Promise<string | null> {
-    return this.storage.get('access_token');
-  }
+  // (el token lo añade AuthInterceptor)
 }

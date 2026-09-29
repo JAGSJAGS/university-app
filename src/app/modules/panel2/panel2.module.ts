@@ -5,6 +5,7 @@ import { Panel2RoutingModule } from './panel2-routing.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
 import { PanelRoutingModule } from '../panel/panel-routing.module';
+import { FormsModule } from "@angular/forms";
 
 
 
@@ -16,7 +17,8 @@ import { PanelRoutingModule } from '../panel/panel-routing.module';
     CommonModule,
     Panel2RoutingModule,
     PrimeNgModule,
-    TranslateModule
-  ]
+    TranslateModule,
+    FormsModule
+]
 })
 export class Panel2Module { }
