@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MenuSubjectComponent } from './pages/menu-subject/menu-subject.component';
 import { MenuSubjectRoutingModule } from './menu-subject-routing.module';
-import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { PrimeNgModule } from '../prime-ng/prime-ng.module';
+import { TranslateModule } from '@ngx-translate/core';
+import { MenuSubjectComponent } from './pages/menu-subject/menu-subject.component';
+import { DragDropModule } from 'primeng/dragdrop';
 
 
 
@@ -17,7 +18,8 @@ import { PrimeNgModule } from '../prime-ng/prime-ng.module';
     MenuSubjectRoutingModule,
     TranslateModule,
     FormsModule,
-    PrimeNgModule
+    PrimeNgModule,
+    DragDropModule
   ]
 })
 export class MenuSubjectModule { }

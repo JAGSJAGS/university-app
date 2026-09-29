@@ -1,563 +1,619 @@
-import { Component } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { AuthService } from '../../../../auth.service';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Storage } from '@ionic/storage-angular';
-import { MenuSubjectService } from '../../menu-subject.service';
-import { Career, Group, Subject, Subjects, Year } from '../../../../interfaces/Career';
-import { Location } from '@angular/common';
 import { Message } from 'primeng/api';
+import { forkJoin, Observable, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AuthService } from '../../../../auth.service';
+import { Career, Group, Subject, Year } from '../../../../interfaces/Career';
+import { MenuSubjectService } from '../../menu-subject.service';
+
+type EditorMode = 'create' | 'edit';
+
+const emptySubject = (): Subject => ({
+  id: 0,
+  name: '',
+  code: '',
+  quarts: [1, 4],
+  validate: false,
+  fail: false,
+  requirements: [],
+  link: '',
+  credit: 0,
+  group: [],
+  groups: [],
+  critic: false,
+  career_id: 0
+});
+
+const emptyYear = (): Year => ({ id: 0, year: 0, subjects: [], career_id: 0, career_name: '' });
+
+/** El slider va de 0 a 100 y se divide en 4 tramos: cuatrimestres 1 a 4. */
+const FULL_RANGE = [12.5, 87.5];
+const toQuart = (value: number): number => Math.min(4, Math.max(1, Math.ceil(value / 25)));
+const toSlider = (quart: number): number => (quart - 0.5) * 25;
+
+/** El arrastre empieza al mover el puntero este número de píxeles desde el asa. */
+const DRAG_THRESHOLD = 4;
+/** Distancia al borde de la pantalla a partir de la cual la página se desplaza sola. */
+const EDGE_SIZE = 64;
+const EDGE_MAX_SPEED = 24;
+
+/** Estado de un arrastre en curso (o a la espera de que empiece). */
+interface DragState {
+  subject: Subject;
+  pointerId: number;
+  startX: number;
+  startY: number;
+  /** Posición actual del puntero. */
+  x: number;
+  y: number;
+  /** Dónde se agarró la tarjeta, para que el "fantasma" no salte. */
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  height: number;
+  active: boolean;
+}
+
+/** Dónde caería la materia si se soltara ahora. */
+interface DropTarget {
+  /** Posición en la lista completa (antes de sacar la materia que se arrastra). */
+  index: number;
+  /** Altura de la línea indicadora, en píxeles desde el borde superior de la lista. */
+  top: number;
+}
 
 @Component({
   selector: 'app-menu-subject',
   templateUrl: './menu-subject.component.html',
   styleUrl: './menu-subject.component.scss'
 })
-export class MenuSubjectComponent {
+export class MenuSubjectComponent implements OnInit, OnDestroy {
   subs: Subscription = new Subscription();
+  showSpinner = false;
 
-  showCreateSubject: boolean = false;
-  showEditSubject: boolean = false;
-  showNewGroup: boolean = false;
-  showDeleteGroup: boolean = false;
-  showDeleteSubject: boolean = false;
-  showMessage: boolean = false;
+  year: Year = emptyYear();
+  career: Career = { id: 0, name: '', years: [] };
 
-  allSubjects: Subjects = {data:[]};
-  allSubjectsBackUp: Subjects = {data:[]};
-  subjects: Subjects = {data: []};
-  subjectsSelected: any[] = [];
-  rangeValues: number[] = [1, 4];
-  selectsGroups: any [] = [];
-  selectsNoGroups: any [] = [];
-  allGroupsBackup: any = [];
-  groupSelect: any = [];
-  groups: any = [];
+  /** Materias del año, en el orden que se muestra (y se guarda). */
+  subjects: Subject[] = [];
+  /** Todas las materias de la carrera: sirven para elegir requisitos. */
+  allSubjects: Subject[] = [];
+  groups: Group[] = [];
 
-  groupDeleteId: number = 0;
-  nameGroup: string = "";
-  messages: Message[] = [
-    { severity: 'success', summary: 'Success'}
-  ];
+  /** Formulario lateral: null = cerrado. Un solo formulario para crear y editar. */
+  mode: EditorMode | null = null;
+  form: Subject = emptySubject();
+  range: number[] = [...FULL_RANGE];
+  requirementIds: number[] = [];
+  groupIds: number[] = [];
+  nameError = false;
+  creditError = false;
 
-  year: Year = {
-    id:0,
-    year:0,
-    subjects:[],
-    career_id: 0,
-    career_name: ""
-  }
+  /** Pendientes de confirmar el borrado (null = diálogo cerrado). */
+  subjectToDelete: Subject | null = null;
+  groupToDelete: Group | null = null;
 
-  career: Career = {
-    id:0,
-    name: "",
-    years: []
-  }
+  showNewGroup = false;
+  newGroupName = '';
+  groupNameError = false;
 
-  subject: Subject = {
-    id: 0,
-    name: "",
-    code: "",
-    quarts: [1, 4],
-    validate: false,
-    fail: false,
-    requirements:  [],
-    link: "",
-    credit: 0,
-    group: [{
-      id: 0,
-      name: ""
-    }],
-    groups: [],
-    critic: false,
-    career_id: 0
-  }
+  messages: Message[] = [];
+  showMessage = false;
+  private messageTimer?: ReturnType<typeof setTimeout>;
+
+  /** Arrastre en curso y sitio donde caería la materia. */
+  drag: DragState | null = null;
+  dropTarget: DropTarget | null = null;
+  private rafId = 0;
 
   constructor(
     private authService: AuthService,
     private storage: Storage,
     private router: Router,
+    private route: ActivatedRoute,
+    private location: Location,
     private menuSubjectService: MenuSubjectService,
-    private activatedRoute: ActivatedRoute,
-    private location: Location
-  ){}
+    private host: ElementRef<HTMLElement>
+  ) {}
 
   ngOnInit(): void {
-    this.initLoad();
-    
-    
-  }
-  initLoad(){
-    this.activatedRoute.params.subscribe(({ id }) => {
-      this.year.id = id
-      this.getSubjects();
-      this.getYear(id);
-    });
+    this.subs.add(this.route.paramMap.subscribe(params => this.load(Number(params.get('id')))));
   }
 
-  getYear(yearId: number){
-    this.showSpinner = true;
-    this.subs.add(this.menuSubjectService.getYear(yearId).subscribe({
-      next: (year) => {
-        this.year = year.data;
-        this.career.id = this.year.career_id;
-        console.log(this.career)
-        this.getAllGroups();
-        this.showSpinner = false;
-      },
-      error: (error) => {
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error getCareer", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        } 
-        this.showSpinner = false;
-      }
-    }));
+  ngOnDestroy(): void {
+    clearTimeout(this.messageTimer);
+    this.endDrag();
+    this.subs.unsubscribe();
   }
 
-  showSpinner: boolean = false;
-  logoutUser(){
+  // ---------------------------------------------------------------------------
+  // Sesión y navegación
+  // ---------------------------------------------------------------------------
+
+  logoutUser(): void {
     this.showSpinner = true;
     this.subs.add(this.authService.logOutUser().subscribe({
-      next: (valor) => {
+      next: async () => {
+        // Primero se limpia la sesión: /home redirige si "authenticated" sigue en true
+        await this.clearSession();
         this.showSpinner = false;
-        this.storage.set('authenticated', false);
-        this.storage.set('access_token', "");
         this.router.navigate(['/home']);
       },
-      error: (error) => {
-        this.showSpinner = false;
-        this.storage.set('authenticated', false);
-        this.storage.set('access_token', "");
-        console.log("error logOutUser: " + error);
-      }
-    }));
-  }
-
-  selectCreateSubject(){
-    this.showCreateSubject = true; 
-    this.showEditSubject = false;
-    this.allSubjects = {...this.allSubjectsBackUp}
-    this.subjectsSelected = [];
-    this.rangeValues = [0, 1]
-    this.subject = {
-      id: 0,
-      name: "",
-      code: "",
-      quarts: [1, 4],
-      validate: false,
-      fail: false,
-      requirements:  [],
-      link: "",
-      credit: 0,
-      group: [{
-        id: 0,
-        name: ""
-      }],
-      groups: [],
-      critic: false,
-      career_id: 0
-    }
-  }
-
-  order(direction: string, subjects: { data: Subject[] }, subject: Subject) {
-    let index = subjects.data.findIndex(s => s.id === subject.id);
-
-    if (index === -1) return; // Si el subject no existe, salir de la función
-
-    if (direction === 'down' && index < subjects.data.length - 1) {
-        // Intercambia con el siguiente subject si existe
-        [subjects.data[index], subjects.data[index + 1]] = [subjects.data[index + 1], subjects.data[index]];
-    } else if (direction === 'up' && index > 0) {
-        // Intercambia con el anterior subject si existe
-        [subjects.data[index], subjects.data[index - 1]] = [subjects.data[index - 1], subjects.data[index]];
-    }
-
-    let subjectIds = subjects.data.map((subject: Subject) => subject.id);
-
-    this.showSpinner = true;
-    this.subs.add(this.menuSubjectService.orderSubject(this.career.id, this.year, subjectIds).subscribe({
-      next: (subjects) => {
-        this.showSpinner = false;
-      },
-      error: (error) => {
-        this.showSpinner = false;
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error orderSubjects", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        } 
-      }
-    }));
-  }
-
-  selectEditSubject(subject: Subject){
-    this.allSubjects = {...this.allSubjectsBackUp}
-    this.subjectsSelected = [];
-    this.showEditSubject = false;
-    setTimeout(() => {
-      this.showEditSubject = true;
-    }, 10);
-    this.showCreateSubject = false;
-    this.subject = {...subject}
-    console.log(this.subject.quarts[0]);
-    console.log(this.subject.quarts[1]);
-    this.rangeValues [0] = this.reverseConvertRange(this.subject.quarts[0]);
-    this.rangeValues [1] = this.reverseConvertRange(this.subject.quarts[1]);
-    subject.requirements.forEach( id => {
-      this.selectSubject(id);
-    })
-    this.groupsFilter();
-  }
-
-  reverseConvertRange(num: number): number {
-    let res = 0;
-    
-    switch(num) {
-      case 1:
-        res = 12.5; // Centrado en el rango 0-25
-        break;
-      case 2:
-        res = 37.5; // Centrado en el rango 26-50
-        break;
-      case 3:
-        res = 62.5; // Centrado en el rango 51-75
-        break;
-      case 4:
-        res = 87.5; // Centrado en el rango 76-100
-        break;
-    }
-    return res;
-  }
-
-  selectSubject(id: number) {
-    let subjectToDelete = this.allSubjects.data.find(subject => subject.id === id);
-  
-    if (subjectToDelete) {
-      this.subjectsSelected.push(subjectToDelete);
-      this.allSubjects.data = this.allSubjects.data.filter(subject => subject.id !== id);
-    }
-  }
-
-  
-  groupsFilter(){
-    this.subject.group
-    let groupIds = this.subject.group.map(group => group.id);
-    this.selectsGroups = this.allGroupsBackup.filter((group : any) =>
-      !groupIds.includes(group.id)
-    );
-    
-    this.selectsNoGroups = this.allGroupsBackup.filter((group : any) =>
-      groupIds.includes(group.id)
-    );
-  }
-
-  getSubjects(){
-    this.showSpinner = true;
-    this.subs.add(this.menuSubjectService.getSubjects(this.year).subscribe({
-      next: (subjects) => {
-        this.subjects = {...subjects};
-        this.showSpinner = false;
-        //this.career.id = this.subjects.data[0].career_id;
-        this.getAllSubjects();
-      },
-      error: (error) => {
-        //this.showSpinner = false;
-        console.log("Error en el inicio de sesión:", error);
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error al crear Carrera", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        }
+      error: async (error) => {
+        console.log('error logOutUser:', error);
+        await this.clearSession();
         this.showSpinner = false;
       }
     }));
   }
 
-  selectDeleteSubject(subject: Subject){
-    this.showDeleteSubject = true;
-    this.subject = {...subject};
-  }
-
-  deleteSubject(){
-    this.showSpinner = true;
-    this.subs.add(this.menuSubjectService.deleteSubject(this.subject.id).subscribe({
-      next: (subject) => {
-        this.getSubjects();
-        this.getAllSubjects();
-        this.showSpinner = false;
-        this.messages[0].severity = "success";
-        this.messages[0].summary = "Success delete subject"
-        this.showMessage = true;
-      },
-      error: (error) => {
-        //this.showSpinner = false;
-        console.log("Error en el inicio de sesión:", error);
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error al crear Carrera", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        }
-        this.showSpinner = false;
-        this.messages[0].severity = "error";
-        this.messages[0].summary = "Error delete subject"
-        this.showMessage = true;
-      }
-    }));
-  }
-
-  getAllSubjects(){
-    this.showSpinner = true;
-    this.subs.add(this.menuSubjectService.getAllSubjects(this.career).subscribe({
-      next: (subjects) => {
-        this.allSubjects = {...subjects};
-        this.allSubjectsBackUp = {...subjects}
-        console.log(this.allSubjects);
-        this.showSpinner = false;
-      },
-      error: (error) => {
-        //this.showSpinner = false;
-        console.log("Error en el inicio de sesión:", error);
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error al crear Carrera", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        }
-        this.showSpinner = false;
-      }
-    }));
-  }
-
-  editSubject(){
-    this.subject.quarts[0] = this.convertRange(this.rangeValues[0]);
-    this.subject.quarts[1] = this.convertRange(this.rangeValues[1]);
-    this.subject.requirements = this.subjectsSelected.map(subject => subject.id);
-    
-    if(this.validate()){
-      this.showSpinner = true;
-      this.subs.add(this.menuSubjectService.updateSubject(this.subject, this.year, this.selectsNoGroups.map(group => group.id)).subscribe({
-        next: (subject) => {
-          this.subject = {...subject.data}
-          this.getSubjects();
-          this.showEditSubject = false;
-          setTimeout(() => {
-            this.showEditSubject = true;
-          }, 10);
-          this.showSpinner = false;
-          this.messages[0].severity = "success";
-          this.messages[0].summary = "Success edit subject"
-          this.showMessage = true;
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          this.showSpinner = false;
-          this.messages[0].severity = "error";
-          this.messages[0].summary = "Error edit subject"
-          this.showMessage = true;
-        }
-      }));
-    }
-  }
-
-  convertRange(num: number){
-    let res = 0;
-    if (num >= 0 && num <= 25) {
-      res = 1;
-    } else if (num >= 26 && num <= 50) {
-      res = 2;
-    } else if (num >= 51 && num <= 75) {
-      res = 3;
-    } else if (num >= 76 && num <= 100) {
-      res = 4;
-    }
-    return res;
-  }
-
-  discardSelectSubject(id: number) {
-    let subjectToRestore = this.subjectsSelected.find(subject => subject.id === id);
-  
-    if (subjectToRestore) {
-      this.allSubjects.data.push(subjectToRestore);
-      this.subjectsSelected = this.subjectsSelected.filter(subject => subject.id !== id);
-    }
-  }
-
-  selectsGroupsSubject(subject: Subject, group: any) {
-    const groupId = group.id; // ID del grupo a mover
-  
-    // Verificar si el grupo está en selectsGroups (seleccionado)
-    const groupIndex = this.selectsGroups.findIndex(g => g.id === groupId);
-  
-    if (groupIndex !== -1) {
-      // Si el grupo está seleccionado, lo movemos a los no seleccionados
-      const groupToMove = this.selectsGroups.splice(groupIndex, 1)[0]; // Elimina el grupo de selectsGroups
-      this.selectsNoGroups.push(groupToMove); // Agrega el grupo a selectsNoGroups
-    } else {
-      // Si el grupo no está seleccionado, lo movemos a los seleccionados
-      const groupIndexInNoSelect = this.selectsNoGroups.findIndex(g => g.id === groupId);
-      if (groupIndexInNoSelect !== -1) {
-        // Si el grupo está en selectsNoGroups, lo movemos a selectsGroups
-        const groupToMove = this.selectsNoGroups.splice(groupIndexInNoSelect, 1)[0]; // Elimina el grupo de selectsNoGroups
-        this.selectsGroups.push(groupToMove); // Agrega el grupo a selectsGroups
-      }
-    }
-  }
-
-  createSubject(){
-    this.subject.quarts[0] = this.convertRange(this.rangeValues[0]);
-    this.subject.quarts[1] = this.convertRange(this.rangeValues[1]);
-    this.subject.requirements = this.subjectsSelected.map(subject => subject.id);
-    console.log(this.subject)
-    console.log(this.year.id)
-    if(this.validate()){
-      this.showSpinner = true;
-      this.subs.add(this.menuSubjectService.createSubject(this.subject, this.year, this.groupSelect.map((group : any) => group.id)).subscribe({
-        next: (subject) => {
-          this.subject = {
-            id: 0,
-            name: "",
-            code: "",
-            quarts: [1, 4],
-            validate: false,
-            fail: false,
-            requirements:  [],
-            link: "",
-            credit: 0,
-            group: [{
-              id: 0,
-              name: ""
-            }],
-            groups: [],
-            critic: false,
-            career_id: 0
-          }
-          this.getSubjects();
-          this.showSpinner = false;
-          this.messages[0].severity = "success";
-          this.messages[0].summary = "Success create subject"
-          this.showMessage = true;
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          this.showSpinner = false;
-          this.messages[0].severity = "error";
-          this.messages[0].summary = "Error create subject"
-          this.showMessage = true;
-        }
-      }));
-    }
-  }
-
-  selectGroup(id: number, name: string) {
-    // Filtrar el grupo de la lista de groups
-    this.groups = this.groups.filter((item: Group) => item.id !== id);
-    
-    // Solo pasar el id y el name a groupSelect
-    this.groupSelect.push({ id, name });
-  }
-
-  deselectGroup(id: number) {
-    // Encontrar el grupo con el id en groupSelect
-    const groupToRemove = this.groupSelect.find((group: { id: number }) => group.id === id);
-    
-    if (groupToRemove) {
-      // Eliminar de groupSelect
-      this.groupSelect = this.groupSelect.filter((group: { id: number }) => group.id !== id);
-      
-      // Agregar el grupo de vuelta a groups
-      this.groups.push(groupToRemove); // Aquí puedes reinsertar el grupo si lo necesitas
-    }
-  }
-
-  getAllGroups(){
-    this.showSpinner = true;
-    this.subs.add(this.authService.getAllGroups().subscribe({
-      next: (groups) => {
-        this.groups = [...groups.data]
-        this.selectsGroups  = [...groups.data]
-        this.allGroupsBackup = [...groups.data];
-        this.groupsFilter();
-        this.showSpinner = false;
-      },
-      error: (error) => {
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error getGroups", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        } 
-        this.showSpinner = false;
-      }
-    }));
-  }
-
-  createGroup(){
-    this.showSpinner = true;
-    this.subs.add(this.authService.createGroup(this.nameGroup).subscribe({
-      next: (group) => {
-        this.getAllGroups();
-        this.showNewGroup = false;
-        this.showSpinner = false;
-        this.messages[0].severity = "success";
-        this.messages[0].summary = "Success create group"
-        this.showMessage = true;
-      },
-      error: (error) => {
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error getGroups", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        } 
-        this.showSpinner = false;
-        this.messages[0].severity = "error";
-        this.messages[0].summary = "Error create group"
-        this.showMessage = true;
-      }
-    }));
-  }
-
-  deleteGroup(){
-    this.subs.add(this.authService.deleteGroup(this.groupDeleteId).subscribe({
-      next: (groups) => {
-        this.getAllGroups();
-      },
-      error: (error) => {
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error deleteGroup", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        } 
-      }
-    }));
-  }
-
-  validate(){
-    return true;
+  private clearSession(): Promise<unknown> {
+    return Promise.all([
+      this.storage.set('authenticated', false),
+      this.storage.set('access_token', '')
+    ]);
   }
 
   goBack(): void {
     this.location.back();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Datos
+  // ---------------------------------------------------------------------------
+
+  /** Carga el año primero: su career_id hace falta para pedir las materias de la carrera. */
+  private load(yearId: number): void {
+    this.showSpinner = true;
+    this.subs.add(this.menuSubjectService.getYear(yearId).pipe(
+      switchMap(res => {
+        this.year = res.data;
+        this.career = { ...this.career, id: this.year.career_id };
+        return forkJoin({
+          lists: this.fetchLists(),
+          groups: this.authService.getAllGroups()
+        });
+      })
+    ).subscribe({
+      next: ({ lists, groups }) => {
+        this.applyLists(lists);
+        this.groups = [...groups.data];
+        this.showSpinner = false;
+      },
+      error: (error) => {
+        this.showSpinner = false;
+        console.log('error load:', error?.error?.message ?? error);
+      }
+    }));
+  }
+
+  private fetchLists() {
+    return forkJoin({
+      subjects: this.menuSubjectService.getSubjects(this.year),
+      all: this.menuSubjectService.getAllSubjects(this.career)
+    });
+  }
+
+  private applyLists(lists: { subjects: { data: Subject[] }; all: { data: Subject[] } }): void {
+    this.subjects = [...lists.subjects.data];
+    this.allSubjects = [...lists.all.data];
+  }
+
+  private refreshLists(): void {
+    this.subs.add(this.fetchLists().subscribe({
+      next: lists => this.applyLists(lists),
+      error: (error) => console.log('error refreshLists:', error?.error?.message ?? error)
+    }));
+  }
+
+  private getGroups(): void {
+    this.subs.add(this.authService.getAllGroups().subscribe({
+      next: (groups) => this.groups = [...groups.data],
+      error: (error) => console.log('error getGroups:', error?.error?.message ?? error)
+    }));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Orden (drag and drop)
+  // ---------------------------------------------------------------------------
+
+  isDragging(subject: Subject): boolean {
+    return !!this.drag?.active && this.drag.subject === subject;
+  }
+
+  /** Empieza a arrastrar al mover el puntero unos píxeles desde el asa (ratón, dedo o lápiz). */
+  onPointerDown(event: PointerEvent, subject: Subject): void {
+    if (this.drag || (event.pointerType === 'mouse' && event.button !== 0)) {
+      return;
+    }
+    const handle = event.currentTarget as HTMLElement;
+    const rect = (handle.closest('.subject') ?? handle).getBoundingClientRect();
+    this.drag = {
+      subject,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: event.clientX,
+      y: event.clientY,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      width: rect.width,
+      height: rect.height,
+      active: false
+    };
+  }
+
+  @HostListener('document:pointermove', ['$event'])
+  onPointerMove(event: PointerEvent): void {
+    const d = this.drag;
+    if (!d || event.pointerId !== d.pointerId) {
+      return;
+    }
+    d.x = event.clientX;
+    d.y = event.clientY;
+
+    if (!d.active) {
+      if (Math.hypot(d.x - d.startX, d.y - d.startY) >= DRAG_THRESHOLD) {
+        d.active = true;
+        this.updateTarget();
+        this.rafId = requestAnimationFrame(this.autoScroll);
+      }
+      return;
+    }
+    this.updateTarget();
+  }
+
+  @HostListener('document:pointerup', ['$event'])
+  onPointerUp(event: PointerEvent): void {
+    const d = this.drag;
+    if (!d || event.pointerId !== d.pointerId) {
+      return;
+    }
+    if (!d.active) {
+      this.endDrag();
+      return;
+    }
+    d.x = event.clientX;
+    d.y = event.clientY;
+    this.updateTarget();
+    const target = this.dropTarget;
+    const from = this.subjects.indexOf(d.subject);
+    this.endDrag();
+    if (target && from !== -1) {
+      // El índice se calculó con la lista completa: al sacar la materia, los siguientes bajan una posición
+      this.moveSubject(from, target.index > from ? target.index - 1 : target.index);
+    }
+  }
+
+  @HostListener('document:pointercancel', ['$event'])
+  onPointerCancel(event: PointerEvent): void {
+    if (this.drag && event.pointerId === this.drag.pointerId) {
+      this.endDrag();
+    }
+  }
+
+  /** Termina (o cancela) el arrastre y deja todo limpio. */
+  private endDrag(): void {
+    cancelAnimationFrame(this.rafId);
+    this.drag = null;
+    this.dropTarget = null;
+  }
+
+  /** Desplaza la página cuando se arrastra cerca del borde superior o inferior de la pantalla. */
+  private readonly autoScroll = (): void => {
+    const d = this.drag;
+    if (!d?.active) {
+      return;
+    }
+    const height = window.innerHeight;
+    let speed = 0;
+    if (d.y < EDGE_SIZE) {
+      speed = -(EDGE_SIZE - d.y) / 3;
+    } else if (d.y > height - EDGE_SIZE) {
+      speed = (d.y - (height - EDGE_SIZE)) / 3;
+    }
+    speed = Math.max(-EDGE_MAX_SPEED, Math.min(EDGE_MAX_SPEED, Math.round(speed)));
+    if (speed) {
+      window.scrollBy(0, speed);
+      this.updateTarget();
+    }
+    this.rafId = requestAnimationFrame(this.autoScroll);
+  };
+
+  private updateTarget(): void {
+    const d = this.drag;
+    this.dropTarget = d?.active ? this.locate(d.x, d.y) : null;
+  }
+
+  /** Busca la posición de inserción entre las materias. Fuera de la lista horizontalmente = cancelar. */
+  private locate(x: number, y: number): DropTarget | null {
+    const list = this.host.nativeElement.querySelector<HTMLElement>('.list');
+    if (!list) {
+      return null;
+    }
+    const box = list.getBoundingClientRect();
+    if (x < box.left || x > box.right) {
+      return null;
+    }
+    const rows = Array.from(list.querySelectorAll<HTMLElement>(':scope > .subject'));
+    if (rows.length === 0) {
+      return null;
+    }
+
+    let index = rows.length;
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i].getBoundingClientRect();
+      if (y < r.top + r.height / 2) {
+        index = i;
+        break;
+      }
+    }
+
+    const top = index < rows.length
+      ? rows[index].getBoundingClientRect().top - box.top - 4
+      : rows[rows.length - 1].getBoundingClientRect().bottom - box.top + 4;
+    return { index, top };
+  }
+
+  /** Mueve una materia y guarda el nuevo orden. También lo usan las flechas del teclado. */
+  moveSubject(from: number, to: number): void {
+    if (from === to || to < 0 || to >= this.subjects.length) {
+      return;
+    }
+    const previous = [...this.subjects];
+    this.subjects.splice(to, 0, this.subjects.splice(from, 1)[0]);
+
+    // Sin spinner a pantalla completa: la lista ya se ve reordenada; si falla, se revierte
+    this.subs.add(this.menuSubjectService
+      .orderSubject(this.career.id, this.year, this.subjects.map(s => s.id))
+      .subscribe({
+        error: (error) => {
+          this.subjects = previous;
+          console.log('error orderSubjects:', error?.error?.message ?? error);
+          this.notify('error', 'Error order subjects');
+        }
+      }));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Formulario (crear / editar)
+  // ---------------------------------------------------------------------------
+
+  openCreate(): void {
+    this.mode = 'create';
+    this.resetForm();
+  }
+
+  openEdit(subject: Subject): void {
+    this.mode = 'edit';
+    this.form = { ...subject };
+    this.range = [toSlider(subject.quarts[0]), toSlider(subject.quarts[1])];
+    this.requirementIds = [...subject.requirements];
+    this.groupIds = (subject.group ?? []).map(group => group.id);
+    this.clearErrors();
+  }
+
+  closeEditor(): void {
+    this.mode = null;
+    this.clearErrors();
+  }
+
+  private resetForm(): void {
+    this.form = emptySubject();
+    this.range = [...FULL_RANGE];
+    this.requirementIds = [];
+    this.groupIds = [];
+    this.clearErrors();
+  }
+
+  private clearErrors(): void {
+    this.nameError = false;
+    this.creditError = false;
+  }
+
+  save(): void {
+    if (!this.validate()) {
+      return;
+    }
+    const subject: Subject = {
+      ...this.form,
+      name: this.form.name.trim(),
+      quarts: [toQuart(this.range[0]), toQuart(this.range[1])],
+      requirements: [...this.requirementIds]
+    };
+
+    if (this.mode === 'create') {
+      this.run(
+        this.menuSubjectService.createSubject(subject, this.year, this.groupIds),
+        'Success create subject',
+        'Error create subject',
+        () => {
+          this.resetForm(); // el formulario queda abierto para crear otra
+          this.refreshLists();
+        }
+      );
+    } else if (this.mode === 'edit') {
+      this.run(
+        this.menuSubjectService.updateSubject(subject, this.year, this.groupIds),
+        'Success edit subject',
+        'Error edit subject',
+        () => this.refreshLists()
+      );
+    }
+  }
+
+  private validate(): boolean {
+    this.nameError = !this.form.name.trim();
+    this.creditError = !Number.isFinite(this.form.credit) || this.form.credit < 0;
+    return !this.nameError && !this.creditError;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Requisitos y grupos (listas de chips)
+  // ---------------------------------------------------------------------------
+
+  /** Una materia no puede ser requisito de sí misma. */
+  get availableRequirements(): Subject[] {
+    return this.allSubjects.filter(s => s.id !== this.form.id && !this.requirementIds.includes(s.id));
+  }
+
+  get selectedRequirements(): Subject[] {
+    return this.allSubjects.filter(s => this.requirementIds.includes(s.id));
+  }
+
+  get availableGroups(): Group[] {
+    return this.groups.filter(g => !this.groupIds.includes(g.id));
+  }
+
+  get selectedGroups(): Group[] {
+    return this.groups.filter(g => this.groupIds.includes(g.id));
+  }
+
+  toggleRequirement(id: number): void {
+    this.requirementIds = this.toggle(this.requirementIds, id);
+  }
+
+  toggleGroup(id: number): void {
+    this.groupIds = this.toggle(this.groupIds, id);
+  }
+
+  private toggle(ids: number[], id: number): number[] {
+    return ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];
+  }
+
+  // ---------------------------------------------------------------------------
+  // Grupos: crear y borrar
+  // ---------------------------------------------------------------------------
+
+  openNewGroup(): void {
+    this.showNewGroup = true;
+  }
+
+  closeNewGroup(): void {
+    this.showNewGroup = false;
+    this.newGroupName = '';
+    this.groupNameError = false;
+  }
+
+  createGroup(): void {
+    const name = this.newGroupName.trim();
+    this.groupNameError = !name;
+    if (this.groupNameError) {
+      return;
+    }
+    this.run(
+      this.authService.createGroup(name),
+      'Success create group',
+      'Error create group',
+      () => {
+        this.closeNewGroup();
+        this.getGroups();
+      }
+    );
+  }
+
+  askDeleteGroup(group: Group): void {
+    this.groupToDelete = group;
+  }
+
+  cancelDeleteGroup(): void {
+    this.groupToDelete = null;
+  }
+
+  confirmDeleteGroup(): void {
+    const group = this.groupToDelete;
+    if (!group) {
+      return;
+    }
+    this.groupToDelete = null;
+    this.run(
+      this.authService.deleteGroup(group.id),
+      'Success delete group',
+      'Error delete group',
+      () => {
+        this.groupIds = this.groupIds.filter(id => id !== group.id);
+        this.getGroups();
+      }
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Borrado de materias
+  // ---------------------------------------------------------------------------
+
+  askDelete(subject: Subject): void {
+    this.subjectToDelete = subject;
+  }
+
+  cancelDelete(): void {
+    this.subjectToDelete = null;
+  }
+
+  confirmDelete(): void {
+    const subject = this.subjectToDelete;
+    if (!subject) {
+      return;
+    }
+    this.subjectToDelete = null;
+    this.run(
+      this.menuSubjectService.deleteSubject(subject.id),
+      'Success delete subject',
+      'Error delete subject',
+      () => {
+        // Si justo se estaba editando la materia borrada, se cierra el formulario
+        if (this.mode === 'edit' && this.form.id === subject.id) {
+          this.closeEditor();
+        }
+        this.requirementIds = this.requirementIds.filter(id => id !== subject.id);
+        this.refreshLists();
+      }
+    );
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.drag) {
+      this.endDrag();
+    } else if (this.groupToDelete) {
+      this.cancelDeleteGroup();
+    } else if (this.subjectToDelete) {
+      this.cancelDelete();
+    } else if (this.showNewGroup) {
+      this.closeNewGroup();
+    } else if (this.mode) {
+      this.closeEditor();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Peticiones de escritura y avisos
+  // ---------------------------------------------------------------------------
+
+  /** Lanza una petición de escritura: spinner y aviso de éxito o error. Lo demás va en onSuccess. */
+  private run(request: Observable<unknown>, okText: string, errorText: string, onSuccess?: () => void): void {
+    this.showSpinner = true;
+    this.subs.add(request.subscribe({
+      next: () => {
+        this.showSpinner = false;
+        onSuccess?.();
+        this.notify('success', okText);
+      },
+      error: (error) => {
+        this.showSpinner = false;
+        console.log(errorText + ':', error?.error?.message ?? error);
+        this.notify('error', errorText);
+      }
+    }));
+  }
+
+  /** Muestra un aviso que se cierra solo (o al hacer clic). */
+  private notify(severity: 'success' | 'error', summary: string): void {
+    this.messages = [{ severity, summary }];
+    this.showMessage = true;
+    clearTimeout(this.messageTimer);
+    this.messageTimer = setTimeout(() => this.showMessage = false, 3500);
   }
 }
