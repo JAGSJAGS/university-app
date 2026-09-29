@@ -1,95 +1,142 @@
-<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
+<header class="topbar">
+  <img class="topbar__logo" src="assets/img/logo2.png" alt="">
+  <button type="button" class="btn btn--danger" (click)="logoutUser()">Sluiten</button>
+</header>
 
-<div class="container">
-    <div class="container-show-career">
-        <div class="section-career modalAnimation">
-            <div class="container-career">
-                <div class="menu-top">
-                    <i class="pi pi-arrow-left" (click)="this.goBack()"></i>
-                </div>
-                <br>
-                <p>{{this.career.name}}</p>
-                <div class="title-career">
-                    
-                    <h5>{{ "MENU.YEARS" | translate}}</h5>
-                    <div style="display: flex;  flex-direction: row;">
-                        <button style="margin-right: 5px;" (click)="this.showAllYears = true; this.getAllYears();">{{ "MENU.CLONE" | translate}}</button>
-                        <i class="pi pi-plus-circle" (click)="this.selectCreateYear()"></i>  
-                    </div>
-                </div>
-                <br>
-                <div class="career" *ngFor="let year of this.years.data ">
-                    <button (click)="selectSubjects(year)">{{year.year}}</button>
-                    <div class="icons">
-                        <i class="pi pi-file-edit" (click)="this.selectUpdateYear(year)"></i> 
-                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="this.selectDeleteYear(year)"></i>
-                    </div>
-                </div>
-            </div>
-            <br>
+<main class="page">
+  <div class="layout" [class.layout--split]="mode">
 
-            <div class="container-career modalAnimation" *ngIf="this.showEditYear" style="margin-left: 4%;">
-                <div class="exit"><i class="pi pi-times" (click)="this.showEditYear = false"></i></div>
-                <h5>{{ "MENU.EDITYEARS" | translate}}</h5>
-                <br>
-                <form (ngSubmit)="updateYear()" #loginForm="ngForm"> 
-                    <div class="form-group input">
-                        <p>{{ "MENU.YEAR" | translate}}</p>
-                        <input type="number" id="yearEdit" name="yearEdit" [(ngModel)]="this.year.year" required placeholder="New Year">
-                        
-                    </div>
-                    <br>
-                    <div class="button"><button type="submit">{{ "MENU.EDITYEAR" | translate}}</button></div> 
-                </form>
-            </div>
-
-            <div class="container-career modalAnimation" *ngIf="this.showCreateYear" style="margin-left: 4%;">
-                <div class="exit"><i class="pi pi-times" (click)="this.showCreateYear = false"></i></div>
-                <h5>{{ "MENU.EDITYEAR" | translate}}</h5>
-                <br>
-                <form (ngSubmit)="createYear()" #loginForm="ngForm"> 
-                    <div class="form-group input">
-                        <input type="number" id="year" name="year" [(ngModel)]="this.year.year" required placeholder="New Year">
-                    </div>
-                    <br>
-                    <div class="button"><button type="submit">{{ "MENU.CREATEYEAR" | translate}}</button></div> 
-                </form>
-            </div>
+    <!-- Lista de años -->
+    <section class="card">
+      <header class="card__head">
+        <div class="card__heading">
+          <button type="button" class="icon-btn" (click)="goBack()" aria-label="Back" title="Back">
+            <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          </button>
+          <div class="card__titles">
+            <h1 class="card__title">{{ "MENU.YEARS" | translate }}</h1>
+            <p class="card__subtitle">{{ career.name }}</p>
+          </div>
         </div>
-    </div>
+        <div class="card__tools">
+          <button type="button" class="btn btn--ghost btn--sm" (click)="openClone()">
+            {{ "MENU.CLONE" | translate }}
+          </button>
+          <button type="button" class="icon-btn icon-btn--primary" (click)="openCreate()"
+                  aria-label="Add" title="Add">
+            <i class="pi pi-plus-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+      </header>
 
-    <div class="container-mesaage" *ngIf="this.showAllYears">
-        <div class="message modalAnimation" style="width: 60%; height: 60%;">
-            <div class="exit" (click)="this.showAllYears = false"><i class="pi pi-times"></i></div>
-            <br>
-            <h5>{{ "MENU.SELECTYEARCLONE" | translate}}</h5>
-            <br>
-            <div style="width: 100%; max-height:80%; background-color: white; display: flex; flex-wrap: wrap; overflow-y: auto; align-items: start;">
-                <div *ngFor="let year of allYears" >
-                    <button style="margin: 5px;" (click)="this.cloneYear(year)">{{year.career_name}}, {{ "MENU.YEAR" | translate}}: {{year.year}}</button>
-                </div>
+      <ul class="list">
+        @for (year of years.data; track year.id) {
+          <li class="row" [class.row--active]="mode === 'edit' && form.id === year.id">
+            <button type="button" class="row__name" (click)="selectSubjects(year)">
+              {{ "MENU.YEAR" | translate }} {{ year.year }}
+            </button>
+            <div class="row__actions">
+              <button type="button" class="icon-btn" (click)="openEdit(year)" aria-label="Edit" title="Edit">
+                <i class="pi pi-file-edit" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="icon-btn icon-btn--danger" (click)="askDelete(year)"
+                      aria-label="Delete" title="Delete">
+                <i class="pi pi-trash" aria-hidden="true"></i>
+              </button>
             </div>
-        </div>
-    </div>
+          </li>
+        }
+      </ul>
+    </section>
 
-    <div class="container-mesaage" *ngIf="this.showDeleteYear" (click)="this.showDeleteYear = false">
-        <div class="message modalAnimation">
-            <div class="exit" (click)="this.showDeleteYear = false"><i class="pi pi-times"></i></div>
-            <br>
-            <p>Are you sure you want to delete?</p>
-            <br>
-            <div class="button"><button (click)="deleteYear()">Delete</button></div>
-        </div>
-    </div>
+    <!-- Formulario de crear / editar -->
+    @if (mode) {
+      <section class="card card--editor pop">
+        <header class="card__head">
+          <h2 class="card__title">
+            {{ (mode === 'create' ? "MENU.CREATEYEAR" : "MENU.EDITYEARS") | translate }}
+          </h2>
+          <button type="button" class="icon-btn" (click)="closeEditor()" aria-label="Close" title="Close">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </header>
 
-    <div class="spinner" *ngIf="showSpinner">
-        <p-progressSpinner styleClass="w-2vh h-2vh" strokeWidth="2" fill="var(--surface-ground)" animationDuration="2s" />
-    </div>
+        <form class="form" (ngSubmit)="save()" #yearForm="ngForm" novalidate>
+          <label class="form__label" for="year-value">{{ "MENU.YEAR" | translate }}</label>
+          <input type="number" id="year-value" name="year" [(ngModel)]="form.year" required
+                 min="1" step="1" inputmode="numeric" placeholder="New Year" autocomplete="off"
+                 [class.form__input--error]="yearError"
+                 [attr.aria-invalid]="yearError"
+                 (input)="yearError = false">
+          @if (yearError) {
+            <p class="form__error" role="alert">Enter a whole number greater than 0.</p>
+          }
+          <div class="form__actions">
+            <button type="submit" class="btn btn--primary">
+              {{ (mode === 'create' ? "MENU.CREATEYEAR" : "MENU.EDITYEAR") | translate }}
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+  </div>
+</main>
 
-    <div style="position: fixed;">
-        <p-messages *ngIf="this.showMessage" (click)="this.showMessage = false"
-        [(value)]="messages" 
-        [enableService]="false" 
-        [closable]="false" />
+<!-- Elegir el año a clonar -->
+@if (showClone) {
+  <div class="backdrop" (click)="closeClone()">
+    <div class="dialog dialog--wide pop" role="dialog" aria-modal="true" aria-labelledby="clone-title"
+         (click)="$event.stopPropagation()">
+      <header class="dialog__head">
+        <h2 class="card__title" id="clone-title">{{ "MENU.SELECTYEARCLONE" | translate }}</h2>
+        <button type="button" class="icon-btn" (click)="closeClone()" aria-label="Close" title="Close">
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="dialog__body">
+        @for (group of cloneGroups; track group.name) {
+          <section class="group">
+            <h3 class="group__name">{{ group.name }}</h3>
+            <div class="group__years">
+              @for (y of group.years; track y.id) {
+                <button type="button" class="chip" (click)="cloneYear(y)">
+                  {{ "MENU.YEAR" | translate }}: {{ y.year }}
+                </button>
+              }
+            </div>
+          </section>
+        }
+      </div>
     </div>
-</div>
+  </div>
+}
+
+<!-- Confirmación de borrado -->
+@if (yearToDelete; as target) {
+  <div class="backdrop" (click)="cancelDelete()">
+    <div class="dialog pop" role="dialog" aria-modal="true" aria-labelledby="delete-title"
+         (click)="$event.stopPropagation()">
+      <p class="dialog__text" id="delete-title">Are you sure you want to delete?</p>
+      <p class="dialog__name">{{ "MENU.YEAR" | translate }} {{ target.year }}</p>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--ghost" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn btn--danger" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showSpinner) {
+  <div class="spinner" role="status" aria-live="polite">
+    <p-progressSpinner [style]="{ width: '3rem', height: '3rem' }" strokeWidth="2"
+                       fill="var(--surface-ground)" animationDuration="2s" />
+  </div>
+}
+
+@if (showMessage) {
+  <div class="toast">
+    <p-messages (click)="showMessage = false" [(value)]="messages"
+                [enableService]="false" [closable]="false" />
+  </div>
+}

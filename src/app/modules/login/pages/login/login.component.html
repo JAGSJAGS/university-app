@@ -1,18 +1,40 @@
-<div class="container">
-    <div class="container-login"><br>
-      <img src="../../../../../assets/img/logo.png" alt="">
-      <h5>{{ "LOGIN.LOGIN" | translate}}</h5><br>
-      <form (ngSubmit)="login()" #loginForm="ngForm"> 
-          <div class="form-group input">
-            <input type="email" id="email" name="email" [(ngModel)]="this.email" required placeholder="Email">
-            <p *ngIf="this.showErrorEmail">{{this.emailError}}</p>
-          </div>
-          <div class="form-group input">
-            <input type="password" id="password" name="password" [(ngModel)]="this.password" required placeholder="Password">
-            <p *ngIf="this.showErrorPassword">{{this.passwordError}}</p>
-          </div>
-          <button type="submit">{{ "LOGIN.LOGIN" | translate}}</button>
-      </form>
-    </div>
-    <app-message [messageError]="[{ severity: this.severetyMessage, detail: this.messageError }]" *ngIf="this.showMessageError"></app-message>
+<div class="login">
+
+  <main class="card">
+    <img class="card__logo" src="../../../../../assets/img/logo.png" alt="">
+    <h1 class="card__title">{{ "LOGIN.LOGIN" | translate }}</h1>
+
+    <form class="card__form" (ngSubmit)="login()" #loginForm="ngForm" novalidate>
+
+      <div class="field">
+        <label class="sr-only" for="email">Email</label>
+        <input type="email" id="email" name="email" [(ngModel)]="email" required
+               placeholder="Email" autocomplete="username" inputmode="email"
+               [class.field__input--error]="showErrorEmail"
+               [attr.aria-invalid]="showErrorEmail"
+               [attr.aria-describedby]="showErrorEmail ? 'email-error' : null">
+        @if (showErrorEmail) {
+          <p class="field__error" id="email-error" role="alert">{{ emailError }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="sr-only" for="password">Password</label>
+        <input type="password" id="password" name="password" [(ngModel)]="password" required
+               placeholder="Password" autocomplete="current-password"
+               [class.field__input--error]="showErrorPassword"
+               [attr.aria-invalid]="showErrorPassword"
+               [attr.aria-describedby]="showErrorPassword ? 'password-error' : null">
+        @if (showErrorPassword) {
+          <p class="field__error" id="password-error" role="alert">{{ passwordError }}</p>
+        }
+      </div>
+
+      <button type="submit" class="btn">{{ "LOGIN.LOGIN" | translate }}</button>
+    </form>
+  </main>
+
+  @if (showMessageError) {
+    <app-message [messageError]="[{ severity: severetyMessage, detail: messageError }]"></app-message>
+  }
 </div>

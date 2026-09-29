@@ -1,25 +1,42 @@
-<div class="container">
-    <div class="container-login"><br>
-      <h4></h4><br><br>
-      <img src="../../../../../assets/img/logo.png" alt="">
-        <form (ngSubmit)="this.goToPanel()" #loginForm="ngForm"> 
-            <p>{{ "HOME.SELECT" | translate}}</p>
-            <div class="form-group input input-language">
-                <select id="language" name="career" [(ngModel)]="this.career.id" required>
-                    <option value="{{career.id}}" *ngFor="let career of this.careers.data" [routerLink]="['/panel']">{{career.name}}</option>
-                </select>
-            </div>
-            <div class="button-select"><button type="submit">Select</button></div>
-        </form>
+<div class="home">
+
+  <header class="topbar">
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" class="lang__btn" [class.lang__btn--active]="currentLang === 'en'"
+              (click)="changeLanguage('en')" aria-label="English" title="English">
+        <img src="../../../../../assets/img/gran bretaña.jpg" alt="">
+      </button>
+      <button type="button" class="lang__btn" [class.lang__btn--active]="currentLang === 'ne'"
+              (click)="changeLanguage('ne')" aria-label="Nederlands" title="Nederlands">
+        <img src="../../../../../assets/img/belgica.png" alt="">
+      </button>
     </div>
-    <div class="button-login" [routerLink]="['/login']"><button>Login</button></div>
-    <div class="language">
-        <img (click)="changeLanguage('en')" src="../../../../../assets/img/gran bretaña.jpg" alt="">
-        <img (click)="changeLanguage('ne')" src="../../../../../assets/img/belgica.png" alt="">
-    </div>
-    <div class="panel" style="display: flex; justify-content: space-between; width: 80%; margin-left: 10%; border-top: 1px solid #ffffff; padding-top: 10px; position: absolute; bottom: 2vh;" >
-        <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
-        <p style="font-size: 14px; color: #ffffff;">Technologyca AB</p>
-        <p style="font-size: 14px; color: #ffffff;">Dev. by Amado Gimenez</p>
-    </div>
+    <button type="button" class="btn btn--light" [routerLink]="['/login']">Login</button>
+  </header>
+
+  <main class="card">
+    <img class="card__logo" src="../../../../../assets/img/logo.png" alt="">
+
+    <form class="card__form" (ngSubmit)="goToPanel()" #loginForm="ngForm">
+      <label class="card__label" for="career">{{ "HOME.SELECT" | translate }}</label>
+
+      <div class="select">
+        <select id="career" name="career" [(ngModel)]="career.id" [disabled]="showSpinner" required>
+          <option [ngValue]="0" disabled>{{ showSpinner ? '…' : '—' }}</option>
+          @for (c of careers.data; track c.id) {
+            <option [ngValue]="c.id">{{ c.name }}</option>
+          }
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn--primary" [disabled]="!career.id">Select</button>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <img class="footer__logo" src="../../../../../assets/img/logo2.png" alt="">
+    <p>Technologyca AB</p>
+    <p>Dev. by Amado Gimenez</p>
+  </footer>
+
 </div>

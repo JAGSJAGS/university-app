@@ -39,6 +39,11 @@ export class HomeComponent {
     this.getNamesCareer();
   }
 
+  /** Idioma activo, para marcar la bandera seleccionada. */
+  get currentLang(): string {
+    return this.translate.currentLang || this.translate.defaultLang;
+  }
+
   async ifAuthenticated() {
     const isAuthenticated = await this.storage.get('authenticated'); 
     if (isAuthenticated) {
@@ -47,6 +52,9 @@ export class HomeComponent {
   }
 
   goToPanel(){
+    if (!this.career.id) {
+      return;
+    }
     this.router.navigate(['/panel', this.career.id]);
   }
 

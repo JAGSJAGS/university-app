@@ -1,98 +1,239 @@
-<div class="container">
-    <div class="menu-container" (mouseover)="this.showSubjectInformation = ''" style="background-color: #F5F5F7; margin-left: 5%;">
-        <i class="pi pi-arrow-left" style="font-size: 2rem" (click)="this.goBack()"></i>  
-        <i class="pi pi-plus-circle" style="font-size: 2rem" (click)="newYear()"></i>
-        <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
-        <i class="pi pi-file-pdf" style="font-size: 2rem" (click)="this.exportDivToPDF()" (mouseover)="this.showSubjectInformation = ''"></i>
-        <i class="pi pi-refresh" style="font-size: 2rem" (click)="this.initLoad()"></i>
-    </div><br>
-    <div id="htmlContent" class="container-table">
-        <h5 style="width: 100%; text-align: center;">{{this.career.name}}</h5>
-        <br>
-        <div class="table">
-            <div class="p-table" *ngFor="let year of career.years">
-                <div class="title-year"> 
-                {{year.year + " "}} {{ "PANEL.YEAR" | translate}}
-                <i class="pi pi-times" (click)="deleteYearById(year.id)"></i>
-                </div>
-                <p-table [value]="year.subjects">
-                    <ng-template pTemplate="header">
-                    <tr>
-                        <th class="quarts">
-                        <div style="border-left: none;" class="quart">1</div>
-                        <div class="quart">2</div>
-                        <div class="quart">3</div>
-                        <div class="quart">4</div>
-                        </th>
-                    </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-subject>
-                        <tr>
-                            <td style="padding: 2% 1%;"
-                            (mouseover)="this.showSubjectInformation = subject.id; paintGroup(subject)"
-                                        (mouseout)="this.numberGroup = 0">
-                                <div class="subject-container"
-                                        >
-                                    <div
-                                        class="subject sub{{subject.id}}" 
-                                        [id]="'sub' + subject.id" 
-                                        [attr.data-subid]="subject.code"
-                                        [style]="subjectStyle(subject, year)"
-                                        style="font-size: 16px;">
-                                        {{subject.name}}
-                                        <div class="arrow arrowLeft"  (click)="moveSubjectYear(subject, year, 'left')"  *ngIf=" !subject.critic && !subject.fail"><i class="pi pi-angle-left"></i></div>
-                                        <div class="arrow arrowRight" (click)="moveSubjectYear(subject, year, 'right')" *ngIf=" !subject.critic && !subject.fail" ><i class="pi pi-angle-right"></i></div> 
-                                    </div>
-                                </div>
-                                <div class="subject-information" *ngIf="showSubjectInformation === subject.id">
-                                    <p>{{subject.name}}</p>
-                                    <p>{{ "PANEL.CREDITS" | translate}}: {{subject.credit}}</p>
-                                    <a href="{{subject.link}}" target="_blank" rel="noopener noreferrer">Link</a>
-                                    <p *ngIf="subject.group.length >0" style="background-color: #a6ff00ff;" >{{ "PANEL.GROUP" | translate}}: {{subject.group[0].name}}</p>
-                                    <div class="container-button-subject">
-                                        <button class="button-validate" (click)="validate(subject)" *ngIf="!subject.fail" >{{ "PANEL.VALIDATE" | translate}}</button>
-                                        <button class="button-validate" (click)="critic(subject, year)" *ngIf="!subject.critic && year.year === 1 && !subject.fail" style="background-color: #d7531b;">{{ "PANEL.CRITIC" | translate}}</button>
-                                        <button class="button-validate" (click)="noCritic(subject, year)" *ngIf="subject.critic" style="background-color: #d7531b;">{{ "PANEL.NOCRITIC" | translate}}</button>
-                                        <button class="button-fail" (click)="fail(subject, year)" *ngIf="!subject.critic && !subject.fail">{{ "PANEL.FAIL" | translate}}</button>
-                                        <button class="button-fail" (click)="fail(subject, year)" *ngIf="subject.fail">{{ "PANEL.PASS" | translate}}</button>
-                                    </div>  
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-                <div class="quarts-botom">
-                    <div style="border-left: none;" class="quart">{{ allHoursQuarts(year.subjects, 0)}}</div>
-                    <div class="quart">{{ allHoursQuarts(year.subjects, 1)}}</div>
-                    <div class="quart">{{ allHoursQuarts(year.subjects, 2)}}</div>
-                    <div class="quart">{{ allHoursQuarts(year.subjects, 3)}}</div>   
-                </div>
-                <div class="quarts-botom2" 
-                    *ngIf=" this.suma(year) <= 60 ; else quartsbottom" >
-                    {{suma(year)}}
-                </div>
-                <ng-template #quartsbottom>
-                    <div style="color: brown;" 
-                        class="quarts-botom2">
-                            {{this.suma(year)}}
-                        <div style="font-size: 12px">
-                            (max 72)
-                        </div>
-                    </div>
-                </ng-template>
-                
-            </div>
-            
-            
-        </div>
-        <br>
-        <br>
-        <br>
-    </div>
+<div class="panel-page">
 
-    <div class="panel" style="display: flex; justify-content: space-between; width: 80%; margin-left: 10%; border-top: 1px solid #a5a5a5; padding-top: 10px;" >
-  <img src="../../../../../assets/img/logo2.png" alt="" style="width: 10vw;">
-  <p style="font-size: 14px; color: #a5a5a5;">Technologyca AB</p>
-  <p style="font-size: 14px; color: #a5a5a5;">Dev. by Amado Gimenez</p>
-</div>
+  <header class="toolbar">
+    <button type="button" class="icon-btn" (click)="goBack()"
+            [attr.aria-label]="'PANEL.BACK' | translate" [title]="'PANEL.BACK' | translate">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="icon-btn" (click)="addYear()" [disabled]="!career"
+            [attr.aria-label]="'PANEL.ADD_YEAR' | translate" [title]="'PANEL.ADD_YEAR' | translate">
+      <i class="pi pi-plus-circle" aria-hidden="true"></i>
+    </button>
+    <img class="toolbar__logo" src="assets/img/logo2.png" alt="">
+    <button type="button" class="icon-btn" (click)="exportPdf()" [disabled]="!career || exporting"
+            [attr.aria-label]="'PANEL.EXPORT_PDF' | translate" [title]="'PANEL.EXPORT_PDF' | translate">
+      <i class="pi pi-file-pdf" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="icon-btn" (click)="reload()" [disabled]="loading"
+            [attr.aria-label]="'PANEL.RELOAD' | translate" [title]="'PANEL.RELOAD' | translate">
+      <i class="pi pi-refresh" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  <div class="scroller" #scroller [class.scroller--sheet]="selectedCard">
+    @if (loading) {
+      <p class="state" role="status">{{ 'PANEL.LOADING' | translate }}</p>
+    } @else if (loadError) {
+      <div class="state state--error" role="alert">
+        <p>{{ 'PANEL.LOAD_ERROR' | translate }}</p>
+        <button type="button" class="btn" (click)="reload()">{{ 'PANEL.RETRY' | translate }}</button>
+      </div>
+    } @else if (career) {
+      <div id="htmlContent" class="board" [class.board--dragging]="drag?.active" (click)="onBoardClick()">
+
+        <div class="board__head">
+          <h1 class="board__title">{{ career.name }}</h1>
+          <ul class="legend">
+            <li><span class="chip" data-tone="validated"></span>{{ 'PANEL.LEGEND_VALIDATED' | translate }}</li>
+            <li><span class="chip" data-tone="critic"></span>{{ 'PANEL.LEGEND_CRITIC' | translate }}</li>
+            <li><span class="chip" data-tone="failed"></span>{{ 'PANEL.LEGEND_FAILED' | translate }}</li>
+            <li><span class="chip chip--chain"></span>{{ 'PANEL.LEGEND_CHAIN' | translate }}</li>
+            <li><span class="chip chip--conflict"></span>{{ 'PANEL.LEGEND_CONFLICT' | translate }}</li>
+            <li><span class="chip chip--group"></span>{{ 'PANEL.LEGEND_GROUP' | translate }}</li>
+          </ul>
+        </div>
+
+        <div class="columns">
+          @for (column of columns; track column.year.year) {
+            <section class="year-column" [class.year-column--drop]="dropTarget?.year === column.year">
+
+              <header class="year-column__head">
+                <h2>{{ column.year.year }} {{ 'PANEL.YEAR' | translate }}</h2>
+                @if (column.removable) {
+                  <button type="button" class="year-column__remove" (click)="removeYear(column)"
+                          [attr.aria-label]="'PANEL.DELETE_YEAR' | translate" [title]="'PANEL.DELETE_YEAR' | translate">
+                    <i class="pi pi-times" aria-hidden="true"></i>
+                  </button>
+                }
+              </header>
+
+              <div class="quart-row quart-row--head" aria-hidden="true">
+                @for (q of quarts; track q) {
+                  <span>{{ q }}</span>
+                }
+              </div>
+
+              <div class="year-column__body">
+                <div class="guides" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+                @if (dropTarget; as target) {
+                  @if (target.year === column.year) {
+                    <div class="drop-line" aria-hidden="true" [style.top.px]="target.top"></div>
+                  }
+                }
+
+                @for (card of column.cards; track card.key) {
+                  <div class="subject-row">
+                    <div class="subject"
+                         [style.grid-column]="card.gridColumn"
+                         [style.background-color]="card.bg"
+                         [style.color]="card.fg"
+                         [attr.data-tone]="card.tone"
+                         [class.subject--conflict]="card.conflict"
+                         [class.subject--group]="isGroupMatch(card)"
+                         [class.subject--selected]="card.subject === selectedSubject"
+                         [class.subject--draggable]="card.movable"
+                         [class.subject--dragging]="isDragging(card)"
+                         (mouseenter)="hovered = card"
+                         (mouseleave)="hovered = null">
+
+                      <button type="button" class="subject__main"
+                              [attr.title]="card.title"
+                              [attr.aria-pressed]="card.subject === selectedSubject"
+                              (pointerdown)="onPointerDown($event, card)"
+                              (contextmenu)="onContextMenu($event)"
+                              (click)="$event.stopPropagation(); toggleSelect(card)">
+                        <span class="subject__name">{{ card.subject.name }}</span>
+                        <span class="subject__badges" aria-hidden="true">
+                          @if (card.conflict) { <i class="pi pi-exclamation-triangle"></i> }
+                          @if (card.subject.validate) { <i class="pi pi-check"></i> }
+                          @if (card.subject.critic) { <i class="pi pi-flag"></i> }
+                          @if (card.failed) { <i class="pi pi-times-circle"></i> }
+                          @if (card.retake) { <i class="pi pi-replay"></i> }
+                        </span>
+                        @if (card.conflict) { <span class="sr-only">{{ 'PANEL.LEGEND_CONFLICT' | translate }}</span> }
+                        @if (card.subject.validate) { <span class="sr-only">{{ 'PANEL.LEGEND_VALIDATED' | translate }}</span> }
+                        @if (card.subject.critic) { <span class="sr-only">{{ 'PANEL.LEGEND_CRITIC' | translate }}</span> }
+                        @if (card.failed || card.retake) { <span class="sr-only">{{ 'PANEL.LEGEND_FAILED' | translate }}</span> }
+                      </button>
+
+                      @if (card.movable && card.hasPrev) {
+                        <button type="button" class="subject__arrow subject__arrow--prev"
+                                (click)="$event.stopPropagation(); move(card, -1)"
+                                [attr.aria-label]="'PANEL.MOVE_PREV' | translate">
+                          <i class="pi pi-angle-left" aria-hidden="true"></i>
+                        </button>
+                      }
+                      @if (card.movable && card.hasNext) {
+                        <button type="button" class="subject__arrow subject__arrow--next"
+                                (click)="$event.stopPropagation(); move(card, 1)"
+                                [attr.aria-label]="'PANEL.MOVE_NEXT' | translate">
+                          <i class="pi pi-angle-right" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <footer class="year-column__foot">
+                <div class="quart-row">
+                  @for (load of column.quarts; track $index) {
+                    <span>{{ load }}</span>
+                  }
+                </div>
+                <div class="credits" [class.credits--warn]="column.overWarn" [class.credits--max]="column.overMax">
+                  <span>{{ column.credits }}</span>
+                  @if (column.overWarn) {
+                    <small>({{ 'PANEL.MAX' | translate }} {{ creditsMax }})</small>
+                  }
+                </div>
+              </footer>
+
+            </section>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (selectedCard; as card) {
+    <aside class="sheet" role="dialog" [attr.aria-label]="card.subject.name" (click)="$event.stopPropagation()">
+      <header class="sheet__head">
+        <h3>{{ card.subject.name }}</h3>
+        <button type="button" class="icon-btn" (click)="closeDetails()"
+                [attr.aria-label]="'PANEL.CLOSE' | translate" [title]="'PANEL.CLOSE' | translate">
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <dl class="sheet__facts">
+        @if (card.subject.code) {
+          <div><dt>{{ 'PANEL.CODE' | translate }}</dt><dd>{{ card.subject.code }}</dd></div>
+        }
+        <div><dt>{{ 'PANEL.CREDITS' | translate }}</dt><dd>{{ card.subject.credit }}</dd></div>
+        <div><dt>{{ 'PANEL.QUARTERS' | translate }}</dt><dd>{{ card.from }}–{{ card.from + card.span - 1 }}</dd></div>
+        @if (card.groupNames) {
+          <div><dt>{{ 'PANEL.GROUP' | translate }}</dt><dd>{{ card.groupNames }}</dd></div>
+        }
+      </dl>
+
+      @if (card.link; as href) {
+        <a class="sheet__link" [href]="href" target="_blank" rel="noopener noreferrer">
+          <i class="pi pi-external-link" aria-hidden="true"></i> {{ 'PANEL.OPEN_LINK' | translate }}
+        </a>
+      }
+
+      <div class="sheet__actions">
+        @if (!card.failed) {
+          <button type="button" class="btn" [class.btn--on]="card.subject.validate"
+                  [attr.aria-pressed]="card.subject.validate" (click)="toggleValidate(card)">
+            <i class="pi pi-check" aria-hidden="true"></i> {{ 'PANEL.VALIDATE' | translate }}
+          </button>
+        }
+
+        @if (card.subject.critic) {
+          <button type="button" class="btn btn--critic" (click)="critic(card)">{{ 'PANEL.NOCRITIC' | translate }}</button>
+        } @else if (!card.failed && card.year.year === 1) {
+          <button type="button" class="btn btn--critic" (click)="critic(card)" [disabled]="!card.hasNext"
+                  [attr.title]="!card.hasNext ? ('PANEL.NEED_NEXT_YEAR' | translate) : null">
+            {{ 'PANEL.CRITIC' | translate }}
+          </button>
+        }
+
+        @if (card.failed) {
+          <button type="button" class="btn" (click)="clearFailed(card)">{{ 'PANEL.PASS' | translate }}</button>
+        } @else if (!card.subject.critic) {
+          <button type="button" class="btn btn--fail" (click)="markFailed(card)" [disabled]="!card.hasNext"
+                  [attr.title]="!card.hasNext ? ('PANEL.NEED_NEXT_YEAR' | translate) : null">
+            {{ 'PANEL.FAIL' | translate }}
+          </button>
+        }
+
+        @if (card.movable) {
+          @if (card.hasPrev) {
+            <button type="button" class="btn btn--ghost" (click)="move(card, -1)">
+              <i class="pi pi-angle-left" aria-hidden="true"></i> {{ 'PANEL.MOVE_PREV' | translate }}
+            </button>
+          }
+          @if (card.hasNext) {
+            <button type="button" class="btn btn--ghost" (click)="move(card, 1)">
+              {{ 'PANEL.MOVE_NEXT' | translate }} <i class="pi pi-angle-right" aria-hidden="true"></i>
+            </button>
+          }
+        }
+      </div>
+    </aside>
+  }
+
+  <!-- "Fantasma" que sigue al puntero mientras se arrastra una materia -->
+  @if (drag; as d) {
+    @if (d.active) {
+      <div class="subject drag-ghost" aria-hidden="true"
+           [attr.data-tone]="d.card.tone"
+           [style.background-color]="d.card.bg"
+           [style.color]="d.card.fg"
+           [style.width.px]="d.width"
+           [style.height.px]="d.height"
+           [style.transform]="'translate(' + (d.x - d.offsetX) + 'px, ' + (d.y - d.offsetY) + 'px)'">
+        <span class="drag-ghost__name">{{ d.card.subject.name }}</span>
+      </div>
+    }
+  }
+
+  <footer class="page-footer">
+    <img src="assets/img/logo2.png" alt="">
+    <p>Technologyca AB</p>
+    <p>Dev. by Amado Gimenez</p>
+  </footer>
 </div>

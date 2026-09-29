@@ -1,163 +1,518 @@
-.container{
+// Colores y medidas en un solo sitio. Los tonos de las materias se eligen con
+// `data-tone` (ver template), sin colores escritos en el TypeScript.
+:host {
+  display: block;
+  --c-bg: #f5f5f7;
+  --c-surface: #ffffff;
+  --c-board: #fafafc;
+  --c-border: #c6c6c6;
+  --c-guide: #d9d9de;
+  --c-text: #171717;
+  --c-subject: #007e67;
+  --c-critic: #c2410c;     // #d7531b original: contraste 4.1 con texto blanco; este, 5.2
+  --c-validated: #2c2677;  // #687d7f original: contraste 4.4; este, 5.3
+  --c-failed: #8d0044;
+  --c-conflict: #d32f2f;
+  --c-group: #8bd100;
+  --c-warn: #a52a2a;
+  --c-danger: #850000;
+  --c-fail-btn: #7c3a3a;
+  --c-focus: #1a73e8;
+  --col-width: 20rem;
+  --gap: 4px;
+  --radius: 6px;
+  color: var(--c-text);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+// --- Barra superior -----------------------------------------------------------
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-border);
+
+  &__logo {
+    height: 2rem;
+    width: auto;
+  }
+}
+
+// Los <button> heredan estilos globales (fondo verde, texto blanco, padding en %),
+// por eso cada variante fija explícitamente lo que necesita.
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--c-text);
+  font-size: 1.4rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: rgb(0 0 0 / 0.07); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: var(--c-bg); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &--on { background: var(--c-validated); border-color: var(--c-validated); color: #fff; }
+  &--on:hover:not(:disabled) { background: var(--c-validated); }
+  &--critic { background: var(--c-critic); border-color: var(--c-critic); color: #fff; }
+  &--critic:hover:not(:disabled) { background: var(--c-critic); }
+  &--fail { background: var(--c-fail-btn); border-color: var(--c-fail-btn); color: #fff; }
+  &--fail:hover:not(:disabled) { background: var(--c-fail-btn); }
+  &--ghost { background: transparent; }
+}
+
+// --- Tablero ------------------------------------------------------------------
+
+.scroller {
+  overflow-x: auto;
+  padding: 1rem;
+
+  // deja sitio para que el panel de detalle no tape la última fila
+  &--sheet { padding-bottom: 15rem; }
+}
+
+.board {
+  width: max-content;
   min-width: 100%;
-  min-height: 100vh;
-  padding-top: 10vh;
-  align-items: center;
-  padding-bottom: 2vh;
-}
-.menu-container{
-  border: solid #c6c6c6 1px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-  i{
-    color: #171717;
+
+  &__head {
+    position: sticky; // el título y la leyenda se quedan visibles al desplazar
+    left: 0;
+    width: fit-content;
+    max-width: calc(100vw - 2rem);
+    margin-bottom: 1rem;
   }
-  width: 90%;
-  margin-bottom: 5px;
-  padding: 1vh 0vh;
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  // Mientras se arrastra: cursor de agarre y sin selección de texto
+  &--dragging {
+    cursor: grabbing;
+    user-select: none;
+    -webkit-user-select: none;
+
+    .subject__main { cursor: grabbing; }
+  }
 }
-.container-table{
-  min-width: 90%;
-  margin: 0 5%;
-}
-.table{
-  display: flex;
-  flex-direction: row;
-  white-space: nowrap; /* Evita que los elementos se envuelvan */
-  background-color: #FAFAFC;
-  margin-right: 5vw;
-}
-.p-table{
-  width: 30vw;
-  min-height: 65vh;
-  margin-left: 5px;
-  flex: 0 0 auto; /* Evita que los elementos se redimensionen */
-  border: solid #c6c6c6 1px;
-  position: relative;
-  padding-bottom: 10vh;
-}
-.title-year{
+
+.state {
+  padding: 2rem 0;
   text-align: center;
-  font-weight: 500;
-  padding: 1.5vh 0;
-  font-size: 20px;
-  border-bottom: solid 1px #c6c6c6;
-  position: relative;
-  background-color: #F5F5F7;
-  
-  i{
-    position: absolute;
-    top: 0;
-    right: 0;
-    background-color: #850000;
-    color: #ffffff;
-    padding: 5px;
-    font-size: 20px;
+
+  &--error { color: var(--c-warn); }
+  .btn { margin-top: 0.75rem; }
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.chip {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.35rem;
+  vertical-align: -3px;
+  border-radius: 3px;
+  background: var(--c-subject);
+
+  &[data-tone='validated'] { background: var(--c-validated); }
+  &[data-tone='critic'] { background: var(--c-critic); }
+  &[data-tone='failed'] { background: var(--c-failed); }
+  &--chain { background: linear-gradient(135deg, #b99e33 50%, #ecd98a 50%); }
+  &--conflict { outline: 2px solid var(--c-conflict); outline-offset: 1px; }
+  &--group { box-shadow: inset 0 0 0 3px var(--c-group); }
+}
+
+.columns {
+  display: flex;
+  align-items: stretch; // todas las columnas con la altura de la más alta
+  gap: 0.5rem;
+}
+
+// --- Columna de un año ----------------------------------------------------------
+
+.year-column {
+  flex: 0 0 var(--col-width);
+  display: flex;
+  flex-direction: column;
+  background: var(--c-board);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+
+  // Columna sobre la que caería la materia arrastrada
+  &--drop {
+    border-color: var(--c-focus);
+    box-shadow: 0 0 0 1px var(--c-focus);
   }
-}
-.quarts{
-  display: flex;
-  flex-direction: row;
-  padding: 0%;
-  height: 5vh;
-  background-color: #F5F5F7;
-}
-.quart{
-  width: 25%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-left: dashed 1px #c6c6c6;
-}
-.subject{
-  text-align: center;
-  font-size: 12px;
-  padding: 5px 5vh;
-  white-space: nowrap;    /* Evita que el texto se divida en varias líneas */
-  overflow: hidden;       /* Oculta el texto que se desborda */
-  text-overflow: ellipsis;
-  border-radius: 5px;
-  color: #ffffff;
-  background-color: #007e67;
-  position: relative;
-  p{
-    white-space: nowrap; /* Evita que el texto haga un salto de línea */
-    overflow: hidden; /* Oculta el texto que sobrepasa el ancho */
-    text-overflow: ellipsis; /* Agrega los puntos suspensivos */
-  }
-}
-.arrow{
-  width: 5vh;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  i{
-    width: 100%;
-    height: 100%;
-    background-color: #006f914e;
+
+  &__head {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0.6rem 2.75rem;
+    background: var(--c-bg);
+    border-bottom: 1px solid var(--c-border);
+    border-radius: var(--radius) var(--radius) 0 0;
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+
+  &__remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0 var(--radius) 0 0;
+    background: var(--c-danger);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  &__body {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    min-height: 14rem;
+    padding: 0.5rem;
+  }
+
+  &__foot {
+    border-top: 1px solid var(--c-border);
+    background: var(--c-bg);
+    border-radius: 0 0 var(--radius) var(--radius);
   }
 }
-.arrowLeft{
+
+// Línea que marca dónde se insertará la materia (posición absoluta: no mueve las tarjetas)
+.drop-line {
   position: absolute;
-  left: 0px;
-  top: 0px;
-}
-.arrowRight{
-  position: absolute;
-  right: 0px;
-  top: 0px;
+  left: 0.5rem;
+  right: 0.5rem;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  background: var(--c-focus);
+  pointer-events: none;
+  z-index: 2;
 }
 
-.subject-information{
-  width: 100%;
-  background-color: #F5F5F7;
-  border: solid 1px #c6c6c6;
+// Cabecera y pie: 4 cuatrimestres con separadores discontinuos
+.quart-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0;
+  }
+  span + span { border-left: 1px dashed var(--c-border); }
+
+  &--head {
+    background: var(--c-bg);
+    border-bottom: 1px solid var(--c-border);
+  }
+}
+
+.credits {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--c-border);
+  font-weight: 600;
+
+  small { font-size: 0.75rem; font-weight: 400; }
+  &--warn { color: var(--c-warn); }
+  &--max { text-decoration: underline; }
+}
+
+// Guías verticales que continúan los separadores de la cabecera
+.guides {
+  position: absolute;
+  inset: 0 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+  pointer-events: none;
+
+  span + span {
+    margin-left: calc(var(--gap) / -2);
+    border-left: 1px dashed var(--c-guide);
+  }
+}
+
+// --- Materias -------------------------------------------------------------------
+
+.subject-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.subject {
+  position: relative;
+  min-width: 0;
+  min-height: 2.6rem;
   border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  .container-button-subject{
-    padding: 2px 0px;
-    .button-validate{
-      background-color: #687d7f;
-      margin-right: 2.5px;
-    }
-    .button-fail{
-      background-color: #7c3a3a;
-      margin-left: 2.5px;
-    }
+  background: var(--c-subject);
+  color: #fff;
+  // anillos combinables: interior (mismo grupo) y exterior (seleccionada)
+  box-shadow: var(--ring-inset, 0 0 #0000), var(--ring-outer, 0 0 #0000);
+
+  &[data-tone='critic'] { background: var(--c-critic); }
+  &[data-tone='validated'] { background: var(--c-validated); }
+  &[data-tone='failed'] { background: var(--c-failed); }
+
+  // outline y sombras no cambian el tamaño de la tarjeta (el borde de 5px de antes sí)
+  &--conflict { outline: 3px solid var(--c-conflict); outline-offset: 1px; }
+  &--group { --ring-inset: inset 0 0 0 3px var(--c-group); }
+  &--selected { --ring-outer: 0 0 0 2px var(--c-surface), 0 0 0 4px var(--c-text); }
+
+  // Se puede arrastrar (ni crítica ni reprobada)
+  &--draggable &__main { cursor: grab; }
+  // La tarjeta de origen queda atenuada mientras se arrastra su "fantasma"
+  &--dragging { opacity: 0.35; }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    padding: 0.35rem 0.6rem;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+    // el long-press del dedo no debe seleccionar texto ni abrir el menú del sistema
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  &__name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; // hasta 2 líneas antes de cortar con "…"
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+
+  &__badges {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.2rem;
+    font-size: 0.8rem;
+  }
+
+  // Flechas: solo al pasar el ratón o con el foco, y solo en dispositivos con ratón.
+  // En pantallas táctiles se mueve desde el panel de detalle (o arrastrando).
+  &__arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 0.3);
+    color: #fff;
+    cursor: pointer;
+
+    &--prev { left: 0; border-radius: 5px 0 0 5px; }
+    &--next { right: 0; border-radius: 0 5px 5px 0; }
   }
 }
 
-.quarts-botom{
-  position: absolute;
-  bottom: 5vh;
+// Copia flotante que sigue al puntero. Va después de `.subject` para pisar su `position`.
+.drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
   display: flex;
-  flex-direction: row;
-  padding: 0%;
-  height: 5vh;
-  width: 100%;
-  border-top: #c6c6c6 solid 1px;
-  background-color: #F5F5F7;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  opacity: 0.92;
+  pointer-events: none;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.3);
+  cursor: grabbing;
+
+  &__name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
 }
 
-.quarts-botom2{
-  position: absolute;
+@media (hover: hover) {
+  .subject:hover .subject__arrow,
+  .subject:focus-within .subject__arrow {
+    display: inline-flex;
+  }
+}
+
+// --- Panel de detalle (hoja inferior; no empuja el contenido ni sale en el PDF) --------
+
+.sheet {
+  position: fixed;
+  left: 50%;
   bottom: 0;
+  z-index: 30;
+  width: min(36rem, 100%);
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 0.15);
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  &__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0.75rem 0;
+
+    dt { font-size: 0.75rem; color: #6b6b73; }
+    dd { margin: 0; font-weight: 500; }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+    color: #0b5cad;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+// --- Pie de página ----------------------------------------------------------------
+
+.page-footer {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  padding: 0%;
-  height: 5vh;
-  width: 100%;
-  border-top: #c6c6c6 solid 1px;
-  background-color: #F5F5F7;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(80rem, calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.75rem 0 1.5rem;
+  border-top: 1px solid var(--c-border);
+
+  img { height: 2rem; width: auto; }
+  p { font-size: 0.85rem; color: #6f6f6f; }
+}
+
+// --- Copia que se captura para el PDF (clase añadida en `onclone`) ------------------
+
+.is-exporting {
+  .subject__arrow,
+  .year-column__remove { display: none !important; }
+  .subject { --ring-outer: 0 0 #0000; }
 }

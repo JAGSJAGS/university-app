@@ -1,202 +1,227 @@
-import { Component } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { AuthService } from '../../../../auth.service';
-import { Storage } from '@ionic/storage-angular';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Storage } from '@ionic/storage-angular';
+import { Message } from 'primeng/api';
+import { Observable, Subscription } from 'rxjs';
+import { AuthService } from '../../../../auth.service';
 import { Career, Careers } from '../../../../interfaces/Career';
 import { MenuCareerService } from '../../menu-career.service';
-import { Message } from 'primeng/api';
+
+type EditorMode = 'create' | 'edit';
+
+const emptyCareer = (): Career => ({ id: 0, name: '', years: [] });
 
 @Component({
   selector: 'app-menu-career',
   templateUrl: './menu-career.component.html',
   styleUrl: './menu-career.component.scss'
 })
-export class MenuCareerComponent {
+export class MenuCareerComponent implements OnInit, OnDestroy {
   subs: Subscription = new Subscription();
 
-  showSpinner: boolean = false;
-  showCreateCareer: boolean = false;
-  showEditCareer: boolean = false;
-  showDeleteCareer: boolean = false;
-  showMessage: boolean = false;
+  careers: Careers = { data: [] };
+  showSpinner = false;
 
-  messages: Message[] = [
-    { severity: 'success', summary: 'Success'}
-  ];
+  /** Formulario lateral: null = cerrado. Un solo formulario para crear y editar. */
+  mode: EditorMode | null = null;
+  form: Career = emptyCareer();
+  nameError = false;
 
-  career: Career = {
-    id:0,
-    name: "",
-    years: []
-  }
+  /** Carrera pendiente de confirmar el borrado (null = diálogo cerrado). */
+  careerToDelete: Career | null = null;
 
-  careers: Careers = {data: []};
+  messages: Message[] = [];
+  showMessage = false;
+  private messageTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private authService: AuthService,
     private storage: Storage,
     private router: Router,
     private menuCareerService: MenuCareerService
-  ){}
+  ) {}
 
   ngOnInit(): void {
-    //this.getNameCareers();
     this.getCareers();
-    //this.getAllGroups();
   }
 
-  selectCreateCareer(){
-    this.showCreateCareer = true; 
-    this.showEditCareer = false;
-    this.career = {
-      id:0,
-      name: "",
-      years: []
-    }
+  ngOnDestroy(): void {
+    clearTimeout(this.messageTimer);
+    this.subs.unsubscribe();
   }
 
-  logoutUser(){
+  // ---------------------------------------------------------------------------
+  // Sesión
+  // ---------------------------------------------------------------------------
+
+  logoutUser(): void {
     this.showSpinner = true;
     this.subs.add(this.authService.logOutUser().subscribe({
-      next: (valor) => {
+      next: async () => {
+        // Primero se limpia la sesión: /home redirige si "authenticated" sigue en true
+        await this.clearSession();
         this.showSpinner = false;
-        console.log('valor', valor);
-        this.storage.set('authenticated', false);
         this.router.navigate(['/home']);
-        this.storage.set('access_token', "");
-
       },
-      error: (error) => {
+      error: async (error) => {
+        console.log('error logOutUser:', error);
+        await this.clearSession();
         this.showSpinner = false;
-        this.storage.set('authenticated', false);
-        this.storage.set('access_token', "");
-        console.log("error logOutUser: " + error);
       }
     }));
   }
 
-  selectYears(career: Career){
+  private clearSession(): Promise<unknown> {
+    return Promise.all([
+      this.storage.set('authenticated', false),
+      this.storage.set('access_token', '')
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Navegación
+  // ---------------------------------------------------------------------------
+
+  selectYears(career: Career): void {
     this.router.navigate(['/menu-year', career.id]);
   }
 
-  selectEditCareer(career: Career){
-    this.showEditCareer = true;
-    this.showCreateCareer = false;
-    this.career = {...career};
+  openPanel(career: Career): void {
+    this.router.navigate(['/panel', career.id]);
   }
 
-  selectDeleteCareer(career: Career){
-    this.showDeleteCareer = true;
-    this.career = {...career};
+  // ---------------------------------------------------------------------------
+  // Formulario (crear / editar)
+  // ---------------------------------------------------------------------------
+
+  openCreate(): void {
+    this.mode = 'create';
+    this.form = emptyCareer();
+    this.nameError = false;
   }
 
-  createCareer(){
-    if(this.validate()){
-      this.showSpinner = true;
-      this.subs.add(this.menuCareerService.createCareer(this.career).subscribe({
-        next: (career) => {
-          this.career = {
-            id:0,
-            name: "",
-            years: []
-          }
-          this.getCareers();
-          this.showSpinner = false;
-          this.messages[0].severity = "success";
-          this.messages[0].summary = "Success create career"
-          this.showMessage = true;
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          this.showSpinner = false;
-          this.messages[0].severity = "erro";
-          this.messages[0].summary = "Error create career"
-          this.showMessage = true;
-        }
-      }));
+  openEdit(career: Career): void {
+    this.mode = 'edit';
+    this.form = { ...career };
+    this.nameError = false;
+  }
+
+  closeEditor(): void {
+    this.mode = null;
+    this.nameError = false;
+  }
+
+  save(): void {
+    if (!this.validate()) {
+      return;
+    }
+    const career: Career = { ...this.form, name: this.form.name.trim() };
+
+    if (this.mode === 'create') {
+      this.run(
+        this.menuCareerService.createCareer(career),
+        'Success create career',
+        'Error create career',
+        () => this.form = emptyCareer() // el formulario queda abierto para crear otra
+      );
+    } else if (this.mode === 'edit') {
+      this.run(
+        this.menuCareerService.updateCareer(career),
+        'Success update career',
+        'Error update career'
+      );
     }
   }
 
-  updateCareer(){
-    if(this.validate()){
-      this.showSpinner = true;
-      this.subs.add(this.menuCareerService.updateCareer(this.career).subscribe({
-        next: (career) => {
-          this.getCareers();
-          this.showSpinner = false;
-          this.messages[0].severity = "success";
-          this.messages[0].summary = "Success update career"
-          this.showMessage = true;
-        },
-        error: (error) => {
-          //this.showSpinner = false;
-          console.log("Error en el inicio de sesión:", error);
-          if (error && error.error && error.error.message) {
-            //this.messageError = error.error.message; 
-            console.log("Mensaje: error al crear Carrera", error.error.message);
-          } else {
-            console.log("Error desconocido");
-          }
-          this.showSpinner = false;
-          this.messages[0].severity = "error";
-          this.messages[0].summary = "Error update career"
-          this.showMessage = true;
+  private validate(): boolean {
+    this.nameError = !this.form.name.trim();
+    return !this.nameError;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Borrado
+  // ---------------------------------------------------------------------------
+
+  askDelete(career: Career): void {
+    this.careerToDelete = career;
+  }
+
+  cancelDelete(): void {
+    this.careerToDelete = null;
+  }
+
+  confirmDelete(): void {
+    const career = this.careerToDelete;
+    if (!career) {
+      return;
+    }
+    this.careerToDelete = null;
+    this.run(
+      this.menuCareerService.deleteCareer(career),
+      'Success delete career',
+      'Error delete career',
+      () => {
+        // Si justo se estaba editando la carrera borrada, se cierra el formulario
+        if (this.mode === 'edit' && this.form.id === career.id) {
+          this.closeEditor();
         }
-      }));
+      }
+    );
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.careerToDelete) {
+      this.cancelDelete();
+    } else if (this.mode) {
+      this.closeEditor();
     }
   }
 
-  getCareers(){
+  // ---------------------------------------------------------------------------
+  // Datos
+  // ---------------------------------------------------------------------------
+
+  getCareers(): void {
     this.showSpinner = true;
     this.subs.add(this.menuCareerService.getCareers().subscribe({
       next: (careers) => {
-        console.log(careers);
-        this.careers = careers
+        this.careers = careers;
         this.showSpinner = false;
       },
       error: (error) => {
         this.showSpinner = false;
-        console.log("error getCategories: " + error);
+        console.log('error getCareers:', error);
       }
     }));
   }
 
-  deleteCareer(){
+  /**
+   * Lanza una petición de escritura: spinner, aviso de éxito o error y recarga de la lista.
+   * (Antes create/update/delete repetían este bloque tres veces.)
+   */
+  private run(request: Observable<unknown>, okText: string, errorText: string, onSuccess?: () => void): void {
     this.showSpinner = true;
-    this.subs.add(this.menuCareerService.deleteCareer(this.career).subscribe({
-      next: (career) => {
-        this.getCareers();
+    this.subs.add(request.subscribe({
+      next: () => {
         this.showSpinner = false;
-        this.messages[0].severity = "success";
-        this.messages[0].summary = "Success delete career"
-        this.showMessage = true;
+        onSuccess?.();
+        this.getCareers();
+        this.notify('success', okText);
       },
       error: (error) => {
-        //this.showSpinner = false;
-        console.log("Error en el inicio de sesión:", error);
-        if (error && error.error && error.error.message) {
-          //this.messageError = error.error.message; 
-          console.log("Mensaje: error al crear Carrera", error.error.message);
-        } else {
-          console.log("Error desconocido");
-        }
         this.showSpinner = false;
-        this.messages[0].severity = "error";
-        this.messages[0].summary = "Error delete career"
-        this.showMessage = true;
+        console.log(errorText + ':', error?.error?.message ?? error);
+        this.notify('error', errorText);
       }
     }));
   }
 
-  validate(){
-    return true
+  /** Muestra un aviso que se cierra solo (o al hacer clic). */
+  private notify(severity: 'success' | 'error', summary: string): void {
+    this.messages = [{ severity, summary }];
+    this.showMessage = true;
+    clearTimeout(this.messageTimer);
+    this.messageTimer = setTimeout(() => this.showMessage = false, 3500);
   }
 }

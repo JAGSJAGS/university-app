@@ -1,75 +1,102 @@
-<div class="button-closse"><button  (click)="logoutUser()">Sluiten</button></div>
+<header class="topbar">
+  <img class="topbar__logo" src="assets/img/logo2.png" alt="">
+  <button type="button" class="btn btn--danger" (click)="logoutUser()">Sluiten</button>
+</header>
 
-<div class="container">
-    <div class="container-show-career">
-        
-        <div class="section-career modalAnimation">
-            <div class="container-career">
-                <div class="title-career">
-                    <h5>{{ "MENU.CAREER" | translate}}</h5>
-                    <i class="pi pi-plus-circle" (click)="this.selectCreateCareer()"></i>  
-                </div>
-                <br>
-                <div class="career" *ngFor="let career of this.careers.data">
-                    <button (click)="selectYears(career)" >{{career.name}}</button>
-                    <div class="icons">
-                        <i class="pi pi-file-edit" (click)="this.selectEditCareer(career)"></i> 
-                        <i class="pi pi-eye" style="color: green;" [routerLink]="['/panel', career.id]"></i>
-                        <i class="pi pi-trash" style="color: brown; margin-left: 20px;" (click)="this.selectDeleteCareer(career)"></i>
-                    </div>
-                </div>
+<main class="page">
+  <div class="layout" [class.layout--split]="mode">
+
+    <!-- Lista de carreras -->
+    <section class="card">
+      <header class="card__head">
+        <h1 class="card__title">{{ "MENU.CAREER" | translate }}</h1>
+        <button type="button" class="icon-btn icon-btn--primary" (click)="openCreate()"
+                aria-label="Add" title="Add">
+          <i class="pi pi-plus-circle" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <ul class="list">
+        @for (career of careers.data; track career.id) {
+          <li class="career" [class.career--active]="mode === 'edit' && form.id === career.id">
+            <button type="button" class="career__name" (click)="selectYears(career)">{{ career.name }}</button>
+            <div class="career__actions">
+              <button type="button" class="icon-btn" (click)="openEdit(career)"
+                      aria-label="Edit" title="Edit">
+                <i class="pi pi-file-edit" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="icon-btn icon-btn--ok" (click)="openPanel(career)"
+                      aria-label="View panel" title="View panel">
+                <i class="pi pi-eye" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="icon-btn icon-btn--danger" (click)="askDelete(career)"
+                      aria-label="Delete" title="Delete">
+                <i class="pi pi-trash" aria-hidden="true"></i>
+              </button>
             </div>
-            <br>
+          </li>
+        }
+      </ul>
+    </section>
 
-            <div class="container-career modalAnimation" *ngIf="this.showEditCareer" style="margin-left: 4%;">
-                <div class="exit"><i class="pi pi-times" (click)="this.showEditCareer = false"></i></div>
-                <h5>{{ "MENU.CAREER" | translate}}</h5>
-                <br>
-                <form (ngSubmit)="updateCareer()" #loginForm="ngForm"> 
-                    <div class="form-group input">
-                        <p>{{ "MENU.NAME" | translate}}</p>
-                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
-                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
-                    </div>
-                    <br>
-                    <div class="button"><button type="submit">{{ "MENU.EDITCAREER" | translate}}</button></div> 
-                </form>
-            </div>
+    <!-- Formulario de crear / editar -->
+    @if (mode) {
+      <section class="card card--editor pop">
+        <header class="card__head">
+          <h2 class="card__title">
+            {{ (mode === 'create' ? "MENU.CREATECAREER" : "MENU.CAREER") | translate }}
+          </h2>
+          <button type="button" class="icon-btn" (click)="closeEditor()" aria-label="Close" title="Close">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </header>
 
-            <div class="container-career modalAnimation" *ngIf="this.showCreateCareer" style="margin-left: 4%;">
-                <div class="exit"><i class="pi pi-times" (click)="this.showCreateCareer = false"></i></div>
-                <h5>{{ "MENU.CREATECAREER" | translate}}</h5>
-                <br>
-                <form (ngSubmit)="createCareer()" #loginForm="ngForm"> 
-                    <div class="form-group input">
-                        <input type="text" id="name" name="name" [(ngModel)]="this.career.name" required placeholder="Name">
-                        <!-- <p *ngIf="this.showErrorLastName">{{this.lastNameError}}</p> -->
-                    </div>
-                    <br>
-                    <div class="button"><button type="submit">{{ "MENU.CREATE" | translate}}</button></div> 
-                </form>
-            </div>
-        </div>
+        <form class="form" (ngSubmit)="save()" #careerForm="ngForm" novalidate>
+          <label class="form__label" for="career-name">{{ "MENU.NAME" | translate }}</label>
+          <input type="text" id="career-name" name="name" [(ngModel)]="form.name" required
+                 placeholder="Name" autocomplete="off"
+                 [class.form__input--error]="nameError"
+                 [attr.aria-invalid]="nameError"
+                 (input)="nameError = false">
+          @if (nameError) {
+            <p class="form__error" role="alert">The field is required.</p>
+          }
+          <div class="form__actions">
+            <button type="submit" class="btn btn--primary">
+              {{ (mode === 'create' ? "MENU.CREATE" : "MENU.EDITCAREER") | translate }}
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+  </div>
+</main>
+
+<!-- Confirmación de borrado -->
+@if (careerToDelete; as target) {
+  <div class="backdrop" (click)="cancelDelete()">
+    <div class="dialog pop" role="dialog" aria-modal="true" aria-labelledby="delete-title"
+         (click)="$event.stopPropagation()">
+      <p class="dialog__text" id="delete-title">Are you sure you want to delete?</p>
+      <p class="dialog__name">{{ target.name }}</p>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--ghost" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn btn--danger" (click)="confirmDelete()">Delete</button>
+      </div>
     </div>
+  </div>
+}
 
-    <div class="container-mesaage" *ngIf="this.showDeleteCareer" (click)="this.showDeleteCareer = false">
-        <div class="message modalAnimation">
-            <div class="exit" (click)="this.showDeleteCareer = false"><i class="pi pi-times"></i></div>
-            <br>
-            <p>Are you sure you want to delete?</p>
-            <br>
-            <div class="button"><button (click)="deleteCareer()">Delete</button></div>
-        </div>
-    </div>
+@if (showSpinner) {
+  <div class="spinner" role="status" aria-live="polite">
+    <p-progressSpinner [style]="{ width: '3rem', height: '3rem' }" strokeWidth="2"
+                       fill="var(--surface-ground)" animationDuration="2s" />
+  </div>
+}
 
-    <div class="spinner" *ngIf="showSpinner">
-        <p-progressSpinner styleClass="w-2vh h-2vh" strokeWidth="2" fill="var(--surface-ground)" animationDuration="2s" />
-    </div>
-
-    <div style="position: fixed;">
-        <p-messages *ngIf="this.showMessage" (click)="this.showMessage = false"
-        [(value)]="messages" 
-        [enableService]="false" 
-        [closable]="false" />
-    </div>
-</div>
+@if (showMessage) {
+  <div class="toast">
+    <p-messages (click)="showMessage = false" [(value)]="messages"
+                [enableService]="false" [closable]="false" />
+  </div>
+}
